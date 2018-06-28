@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+      <!-- used to allow ajax calls from passing thru -->
+      <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+      <!-- ref to jquery -->
+      <script
+        src="http://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous">
+      </script>
+      <!-- ref to css -->
+      <link rel="stylesheet" type="text/css" href="template.css">
+  </head>
+
+  <div class="login-page">
+    <div class="form">
+      <input type="button" id="api-btn-1" value="GET"/>
+      <input type="button" id="api-btn-2" value="POST"/>
+    </div>
+  </div>
+
+  <script>
+    var apiBtn1 = $("#api-btn-1");
+    var apiBtn2 = $("#api-btn-2");
+
+    // If your API needs headers, add them here as JSON key-value pairs
+    var reqHeaders = {
+      
+    };
+
+    // This is a GET request
+    var makeAPI1Request = function(flairType) {
+      $.ajax({
+        method: "GET",
+        url: "https://murmuring-woodland-62196.herokuapp.com/todos",
+        headers: reqHeaders,
+        success: function(data) {
+          console.log(data);
+          responseDiv.html(JSON.stringify(data, undefined, 2));
+        },
+        error: function() {
+          responseDiv.html("error something isnt right");
+        }
+      });
+    };
+
+    // This is a POST request
+    var makeAPI2Request = function(arg) {
+      $.ajax({
+        url: "https://murmuring-woodland-62196.herokuapp.com/todos",
+        type: "POST",
+        headers: reqHeaders,
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify({text: arg}),
+        dataType: "json",
+        success: function(data) {
+          console.log(data);
+          responseDiv.html(JSON.stringify(data, undefined, 2));
+        },
+        error: function() {
+          responseDiv.html("error with post...");
+        }
+      });
+    };
+
+    apiBtn1.click(function(e) {
+      makeAPI1Request();
+    });
+
+    apiBtn2.click(function(e) {
+      var arg = String(userInput.value);
+      makeAPI2Request(arg);
+    });
+  </script>
+
+</html>
