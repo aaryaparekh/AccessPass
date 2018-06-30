@@ -2,7 +2,16 @@
 
 <html>
 <head>
-  <link rel="stylesheet" type="text/css" href="template.css">
+  <!-- used to allow ajax calls from passing thru -->
+	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+	<!-- ref to jquery -->
+	<script
+		src="http://code.jquery.com/jquery-3.3.1.js"
+		integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+		crossorigin="anonymous">
+	</script>
+	<!-- ref to css -->
+	<link rel="stylesheet" type="text/css" href="template.css">
 </head>
 <div class="login-page">
   <div class="form">
@@ -10,9 +19,42 @@
       <input type="text" placeholder="name"/>
       <input type="password" placeholder="password"/>
       <input type="text" placeholder="email address"/>
-      <button>create</button>
+      <input type="button" id="reg-button" value="Register"/>
       <p class="message">Already registered? <a href="#">Sign In</a></p>
     </form>
   </div>
 </div>
+
+<script>
+	var regButton = $("#reg-button");
+
+	// If your API needs headers, add them here as JSON key-value pairs
+	var reqHeaders = {
+
+	};
+
+	// This is a GET request
+	var regRequest = function(flairType) {
+		$.ajax({
+			contentType: 'application/json; charset=utf-8',
+			data:JSON.stringify({email:"aaryaparekh01@gmail.com", password:"born@0606"}),
+			dataType: "json",
+			type: "POST",
+			url: "https://accessspasstest.herokuapp.com/users/registerNew",
+			headers: reqHeaders,
+			success: function(data) {
+				console.log(data);
+				console.log(JSON.stringify(data, undefined, 2));
+			},
+			error: function() {
+				console.log("error something isnt right when registering");
+			}
+		});
+	};
+
+	loginButton.click(function(e) {
+		regRequest();
+	});
+</script>
+
 </html>
