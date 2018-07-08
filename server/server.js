@@ -34,7 +34,7 @@ app.get('/register', (req, res)=>{
 
 //Registering new user
 app.post('/users/registerNew', (req, res)=>{
-  var body = _.pick(req.body, ['email', 'password']);
+  var body = _.pick(req.body, ['name', 'email', 'password']);
   var user = new User(body);
 
   user.save().then(()=>{

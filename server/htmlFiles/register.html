@@ -15,10 +15,10 @@
 </head>
 <div class="login-page">
   <div class="form">
-    <form class="register-form">
-      <input type="text" placeholder="name"/>
-      <input type="password" placeholder="password"/>
-      <input type="text" placeholder="email address"/>
+    <form class="register-form" id="register-form">
+      <input type="text" placeholder="name" name="name"/>
+      <input type="password" placeholder="password" name="password"/>
+      <input type="text" placeholder="email address" name = "email"/>
       <input type="button" id="reg-button" value="Register"/>
       <p class="message">Already registered? <a href="#">Sign In</a></p>
     </form>
@@ -34,10 +34,10 @@
 	};
 
 	// This is a GET request
-	var regRequest = function(flairType) {
+	var regRequest = function(emailVar, passwordVar, nameVar) {
 		$.ajax({
 			contentType: 'application/json; charset=utf-8',
-			data:JSON.stringify({email:"aaryaparekh01@gmail.com", password:"born@0606"}),
+			data:JSON.stringify({name:nameVar, email:emailVar, password:passwordVar}),
 			dataType: "json",
 			type: "POST",
 			url: "https://accessspasstest.herokuapp.com/users/registerNew",
@@ -53,7 +53,10 @@
 	};
 
 	regButton.click(function(e) {
-		regRequest();
+		var emailVar = document.getElementById("login-form").elements["email"].value;
+		var passwordVar = document.getElementById("login-form").elements["password"].value;
+		var nameVar = document.getElementById("login-form").elements["name"].value;
+		regRequest(emailVar, passwordVar, nameVar);
 	});
 </script>
 
