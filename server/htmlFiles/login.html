@@ -15,9 +15,9 @@
 </head>
 <div class="login-page">
   <div class="form">
-    <form class="login-form">
-      <input type="text" placeholder="username"/>
-      <input type="password" placeholder="password"/>
+    <form class="login-form" id="login-form">
+      <input type="text" placeholder="email" name="email"/>
+      <input type="password" placeholder="password" name="password"/>
       <input type="button" id="login-button" value="Login"/>
       <p class="message">Not registered? <a href="#">Create an account</a></p>
     </form>
@@ -32,11 +32,14 @@
 
 	};
 
+	var email = document.getElementById("login-form").elements["email"].value;
+	var password = document.getElementById("login-form").elements["password"].value;
+
 	// This is a GET request
 	var loginRequest = function(flairType) {
 		$.ajax({
 			contentType: 'application/json; charset=utf-8',
-			data:JSON.stringify({email:"aaryaparekh01@gmail.com", password:"born@0606"}),
+			data:JSON.stringify({email:email, password:password}),
 			dataType: "json",
 			type: "POST",
 			url: "https://accessspasstest.herokuapp.com/users/login",
