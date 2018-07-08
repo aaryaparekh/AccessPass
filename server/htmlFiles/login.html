@@ -32,15 +32,11 @@
 
 	};
 
-	var email = document.getElementById("login-form").elements["email"].value;
-	var password = document.getElementById("login-form").elements["password"].value;
-	console.log(email);
-	console.log(password);
-	// This is a GET request
-	var loginRequest = function(flairType) {
+	// This is a POST request
+	var loginRequest = function(emailVar, passwordVar) {
 		$.ajax({
 			contentType: 'application/json; charset=utf-8',
-			data:JSON.stringify({email:"aaryaparekh01@gmail.com", password:"born@0606"}),
+			data:JSON.stringify({email:emailVar, password:passwordVar}),
 			dataType: "json",
 			type: "POST",
 			url: "https://accessspasstest.herokuapp.com/users/login",
@@ -56,7 +52,9 @@
 	};
 
 	loginButton.click(function(e) {
-		loginRequest();
+		var emailVar = document.getElementById("login-form").elements["email"].value;
+		var passwordVar = document.getElementById("login-form").elements["password"].value;
+		loginRequest(emailVar, passwordVar);
 	});
 </script>
 
