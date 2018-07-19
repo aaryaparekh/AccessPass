@@ -51,6 +51,7 @@ UserSchema.methods.toJSON = function(){
 };
 
 //instance method
+//generateAuthToken for student
 UserSchema.methods.generateAuthToken = function() {
   var user = this; //Get the individual document
   var access = 'auth';
@@ -64,7 +65,7 @@ UserSchema.methods.generateAuthToken = function() {
   });
 };
 
-//Loggin route
+//Loggout
 UserSchema.methods.removeToken = function(tokenArgument){
   var user = this;
 
@@ -89,6 +90,7 @@ UserSchema.statics.findByToken = function(token){
     return Promise.reject(); //Same thing as returning a new promise, and then rejecting it.
   }
 
+//Student findOne
 //Query the database, return the document that is found with the give query or return none if there are none.
   return User.findOne({
     _id: decoded._id,
