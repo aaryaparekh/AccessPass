@@ -5,6 +5,9 @@
   padding: 8% 0 0;
   margin: auto;
 }
+h1 {
+    font-family: "Roboto";
+}
 .form {
   position: relative;
   z-index: 1;
@@ -15,6 +18,17 @@
   text-align: center;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
+.box {
+  position: relative;
+  z-index: 1;
+  background: #D3D3D3;
+  margin: 0px;
+  padding: 0px;
+  width: 200px;
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
 .form input {
   font-family: "Roboto", sans-serif;
   outline: 0;
@@ -27,6 +41,13 @@
   font-size: 14px;
 }
 
+.util {
+    background: #4CAF50;
+}
+.util:hover {
+    cursor: pointer;
+    background: #43A047;
+}
 
 input[type=button] {
   font-family: "Roboto", sans-serif;
