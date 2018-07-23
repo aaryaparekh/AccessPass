@@ -39,7 +39,11 @@ var TeacherSchema = new mongoose.Schema({
       type:String,
       require:true
     }
-  }]
+  }],
+  signUpKey:{
+    type:String,
+    require:false
+  }
 });
 
 //overide .toJSON method to only send back what we want to send send back
@@ -74,6 +78,24 @@ TeacherSchema.methods.removeToken = function(tokenArgument){
       }
     }
   });
+};
+
+//Generate Sign up signUpKey
+TeacherSchema.methods.generateSignUpKey = function(){
+  var user = this;
+  var key = "123456";
+
+  return user.update({
+    $push:{
+      signUpKey:key
+    }
+  }).then(()=>{
+    return key;
+  });
+
+  // return user.save().then(()=>{
+  //   return key;
+  // });
 };
 
 TeacherSchema.statics.findByToken = function(token){

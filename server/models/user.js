@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
+var {Teacher} = require('./teacher');
+
 var UserSchema = new mongoose.Schema({
   name:{
     type:String,
@@ -39,7 +41,11 @@ var UserSchema = new mongoose.Schema({
       type:String,
       require:true
     }
-  }]
+  }],
+  teachers:{
+    type:Array,
+    unique:true
+  }
 });
 
 //overide .toJSON method to only send back what we want to send send back
@@ -76,7 +82,32 @@ UserSchema.methods.removeToken = function(tokenArgument){
       }
     }
   });
+};
 
+UserSchema.methods.addTeacher = function(teacherEmail){
+  var user = this;
+  var found = -10;
+  console.log("started method...");
+  return Teacher.findOne({
+    email:teacherEmail
+  }).then((teacher)=>{
+    if(!teacher){
+      console.log("No teacher found");
+      return Promise.reject();
+    }
+    if (user.teachers.length) {
+      found = user.teachers.indexOf(teacher._id);
+      if(found == -1)
+        user.teachers.push(teacher._id);
+
+    } else {
+      user.teachers.push(teacher._id);
+    }
+
+    return user.save().then((savedUser)=>{
+      return savedUser;
+    });
+  });
 };
 
 UserSchema.statics.findByToken = function(token){

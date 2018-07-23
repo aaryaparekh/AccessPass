@@ -9,7 +9,8 @@ var {mongoose} = require('./db/mongoose.js');
 const {ObjectID} = require('mongodb');
 //load in models
 var {User} = require('./models/user');
-var {Teacher} = require('./models/teacher')
+var {Teacher} = require('./models/teacher');
+var {Schedule} = require('./models/schedules2018-2019');
 //middlewear
 var {authenticate} = require('./middlewear/authenticate');
 var {authenticateTeacher} = require('./middlewear/authenticateTeacher')
@@ -99,8 +100,51 @@ app.delete('/users/logOut', authenticate, (req, res)=>{
 
 //loggin out for Teacher
 app.delete('/teachers/logOut', authenticateTeacher, (req, res)=>{
-  req.user.removeToken(req.token).then(()=>{
+  req.teacher.removeToken(req.token).then(()=>{
     res.status(200).send();
+  }, ()=>{
+    res.status(400).send();
+  });
+});
+
+//generate signUpKey for Teachers
+app.post('/teachers/generateSignUpToken', authenticateTeacher, (req, res)=>{
+  req.teacher.generateSignUpKey().then((key)=>{
+    res.status(200).send(key);
+  }, ()=>{
+    res.status(400).send();
+  });
+});
+
+//add student to schedules2018-2019
+app.post('/schedule/addStudent', authenticate, (req, res)=>{
+  var body = _.pick(req.body, ['teacherID', 'date']);
+  var requestData = _.pick(req.body, ['date', 'teacherID', 'studentID']);
+  Schedule.findSchedule(requestData.teacherID, requestData.date).then((schedule)=>{
+      //DO SCHEDULE.STUDENTS.FIND TO MAKE SURE DUPLICATES AREN'T HAPPENING
+       schedule.students.push(requestData.studentID);
+       schedule.save().then(()=>{
+         res.status(200).send(schedule);
+       });
+    }, ()=>{
+    return new Schedule({
+      date: requestData.date,
+      teacherID: requestData.teacherID,
+      students: [requestData.studentID]
+    }).save().then((schedule)=>{
+      res.status(200).send(schedule);
+    });
+
+    res.status(400).send();
+  });
+
+});
+
+//Add teacher with email
+app.post('/users/addTeacher', authenticate, (req, res)=>{
+  var body = _.pick(req.body, ['teacherEmail']);
+  req.user.addTeacher(body.teacherEmail).then((savedUser)=>{
+    res.status(200).send(savedUser);
   }, ()=>{
     res.status(400).send();
   });
