@@ -32,19 +32,16 @@ var UserSchema = new mongoose.Schema({
     require: true,
     minlength: 6
   },
-  tokens:[{
-    access: {
-      type: String,
-      require: true
-    },
-    token:{
-      type:String,
-      require:true
-    }
-  }],
+  access: {
+    type: String,
+    require: true
+  },
+  token:{
+    type:String,
+    require:true
+  },
   teachers:{
-    type:Array,
-    unique:true
+    type:Array
   }
 });
 
@@ -61,25 +58,24 @@ UserSchema.methods.toJSON = function(){
 UserSchema.methods.generateAuthToken = function() {
   var user = this; //Get the individual document
   var access = 'auth';
-  var token = jwt.sign({_id: user._id.toHexString(), access}, 'someSecretValueToSalt').toString();
+  var newToken = jwt.sign({_id: user._id.toHexString(), access}, 'someSecretValueToSalt').toString();
 
-  user.tokens = user.tokens.concat([{access, token}]); //Add this onto the user model for which you call this method.
+  return user.update({
 
-  //return back the return value of saving the document. If it's a success, return back the token.
-  return user.save().then(()=>{
-    return token;
+      token: newToken,
+      access: access
+
+  }).then(()=>{
+    return newToken;
   });
 };
 
 //Loggout
 UserSchema.methods.removeToken = function(tokenArgument){
   var user = this;
-
   return user.update({
-    $pull: { //$pull is a mongoDB operator that allows you to remove things from and array based on certain criteria
-      tokens:{ //pull from the tokens array
+    $unset: {
         token: tokenArgument //pull if on the 'tokens' array there is a 'token' property with the value of the token variable we pass into this function as an argument
-      }
     }
   });
 };
@@ -87,12 +83,10 @@ UserSchema.methods.removeToken = function(tokenArgument){
 UserSchema.methods.addTeacher = function(teacherEmail){
   var user = this;
   var found = -10;
-  console.log("started method...");
   return Teacher.findOne({
     email:teacherEmail
   }).then((teacher)=>{
     if(!teacher){
-      console.log("No teacher found");
       return Promise.reject();
     }
     if (user.teachers.length) {
@@ -125,8 +119,8 @@ UserSchema.statics.findByToken = function(token){
 //Query the database, return the document that is found with the give query or return none if there are none.
   return User.findOne({
     _id: decoded._id,
-    'tokens.token': token,  //To query something thats nested, like tokens.token, you need to wrap it in quotes
-    'tokens.access': 'auth'
+    token: token,  //To query something thats nested, like tokens.token, you need to wrap it in quotes
+    access: 'auth'
   });
 };
 

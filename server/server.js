@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const _=require('lodash');
+const moment = require('moment');
+moment().format();
 
 
 //import local stuff
@@ -21,6 +23,11 @@ app.use(express.static(__dirname+'/htmlFiles')); //config middlewear for express
 
 //variable to hold the port
 const port = process.env.PORT || 3000;
+
+//For testing purposes
+app.post('/test', (req, res)=>{
+  res.status(200).send(getNextDate(4));
+});
 
 //Define pages u want to render
 app.get('/', (req, res) => {
@@ -45,6 +52,7 @@ app.post('/users/registerNew', (req, res)=>{
   }).then((token)=>{
     res.header('x-auth', token).send(user);
   }).catch((e)=>{
+    console.log("something didnt go right");
     res.status(400).send(e);
   });
 });
@@ -53,9 +61,10 @@ app.post('/users/registerNew', (req, res)=>{
 app.post('/teachers/registerNew', (req, res)=>{
   var body = _.pick(req.body, ['name', 'email', 'password']);
   var teacher = new Teacher(body);
-
+  console.log("Teacher", teacher);
   teacher.save().then(()=>{
     return teacher.generateAuthToken();
+    console.log("Generated token")
   }).then((token)=>{
     res.header('x-auth', token).send(teacher);
   }).catch((e)=>{
@@ -118,19 +127,24 @@ app.post('/teachers/generateSignUpToken', authenticateTeacher, (req, res)=>{
 
 //add student to schedules2018-2019
 app.post('/schedule/addStudent', authenticate, (req, res)=>{
-  var body = _.pick(req.body, ['teacherID', 'date']);
-  var requestData = _.pick(req.body, ['date', 'teacherID', 'studentID']);
+  var requestData = _.pick(req.body, ['teacherID']);
   Schedule.findSchedule(requestData.teacherID, requestData.date).then((schedule)=>{
       //DO SCHEDULE.STUDENTS.FIND TO MAKE SURE DUPLICATES AREN'T HAPPENING
-       schedule.students.push(requestData.studentID);
-       schedule.save().then(()=>{
+      if(schedule.students.length){
+        index = schedule.students.indexOf(req.user._id);
+        if(index == -1)
+          schedule.students.push(req.user._id);
+      } else {
+        schedule.students.push(req.user._id);
+      }
+      schedule.save().then(()=>{
          res.status(200).send(schedule);
        });
     }, ()=>{
     return new Schedule({
-      date: requestData.date,
+      date: getNextDate(3),                    //CHANGE THIS TO ADD DATE BASED ON WHAT USER SELECTS
       teacherID: requestData.teacherID,
-      students: [requestData.studentID]
+      students: [req.user._id]
     }).save().then((schedule)=>{
       res.status(200).send(schedule);
     });
@@ -149,6 +163,13 @@ app.post('/users/addTeacher', authenticate, (req, res)=>{
     res.status(400).send();
   });
 });
+
+//Date Generation. Using Moment.js API.
+var getNextDate = function(day){ //day being 0 for sunday 6 for saturday
+  var date = moment().day(day);
+  var formatedDate = date.format("dddd, MMMM Do YYYY");
+  return formatedDate;
+}
 
 app.listen(port, ()=>{
   console.log(`Started server on port ${port}`);

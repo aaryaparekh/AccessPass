@@ -30,16 +30,14 @@ var TeacherSchema = new mongoose.Schema({
     require: true,
     minlength: 6
   },
-  tokens:[{
-    access: {
-      type: String,
-      require: true
-    },
-    token:{
-      type:String,
-      require:true
-    }
-  }],
+  access: {
+    type: String,
+    require: true
+  },
+  token:{
+    type:String,
+    require:true
+  },
   signUpKey:{
     type:String,
     require:false
@@ -58,24 +56,22 @@ TeacherSchema.methods.toJSON = function(){
 TeacherSchema.methods.generateAuthToken = function(){
   var user = this;
   var access = 'teacher';
-  var token = jwt.sign({_id: user._id.toHexString(), access}, 'someSecretValueToSalt');
-
-  user.tokens = user.tokens.concat([{access, token}]);
-
-  return user.save().then(()=>{
-    return token;
+  var newToken = jwt.sign({_id: user._id.toHexString(), access}, 'someSecretValueToSalt');
+  console.log("token", newToken)
+  return user.update({
+    token:newToken,
+    access: access
+  }).then(()=>{
+    return newToken;
   });
 };
 
 //logout
 TeacherSchema.methods.removeToken = function(tokenArgument){
   var user = this;
-
   return user.update({
-    $pull: {
-      tokens:{
-        token: tokenArgument
-      }
+    $unset: {
+        token: tokenArgument //pull if on the 'tokens' array there is a 'token' property with the value of the token variable we pass into this function as an argument
     }
   });
 };
@@ -109,9 +105,9 @@ TeacherSchema.statics.findByToken = function(token){
   }
 
   return User.findOne({
-    _id:decoded._id,
-    'tokens.token':token,
-    'tokens.access':'teacher'
+    _id: decoded._id,
+    token: token,  //To query something thats nested, like tokens.token, you need to wrap it in quotes
+    access: 'teacher'
   });
 };
 

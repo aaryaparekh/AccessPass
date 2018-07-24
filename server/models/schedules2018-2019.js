@@ -3,6 +3,8 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
+const moment = require('moment');
+moment().format();
 
 var ScheduleSchema = new mongoose.Schema({
   date:{
@@ -30,7 +32,7 @@ ScheduleSchema.statics.findSchedule = function(someTeacherID, someDate){
   var Schedule = this;
 
   return Schedule.findOne({
-    date: someDate,
+    date: getNextDate(3),
     teacherID: someTeacherID
   }).then((schedule) => {
     if (!schedule) {
@@ -38,6 +40,13 @@ ScheduleSchema.statics.findSchedule = function(someTeacherID, someDate){
     }
     return schedule;
   });
+}
+
+//Date Generation. Using Moment.js API.
+var getNextDate = function(day){ //day being 0 for sunday 6 for saturday
+  var date = moment().day(day);
+  var formatedDate = date.format("dddd, MMMM Do YYYY");
+  return formatedDate;
 }
 
 var Schedule = mongoose.model('Schedule', ScheduleSchema);
