@@ -116,6 +116,11 @@ app.delete('/teachers/logOut', authenticateTeacher, (req, res)=>{
   });
 });
 
+//Get Student name
+app.get('/users/getName', authenticate, (req, res)=>{
+  res.send(req.user.name);
+})
+
 //generate signUpKey for Teachers
 app.post('/teachers/generateSignUpToken', authenticateTeacher, (req, res)=>{
   req.teacher.generateSignUpKey().then((key)=>{
