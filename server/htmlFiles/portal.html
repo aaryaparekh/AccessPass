@@ -245,7 +245,10 @@
         success: function(data){
           console.log("Added Teacher", data);
           $('#teacherEmailError').fadeOut(500);
-
+          //  while (forum1.firstChild || forum2.firstChild) {
+          //    forum1.removeChild(forum1.firstChild);
+          //    forum2.removeChild(forum2.firstChild);
+          //  }
           (function(){
             $.ajax({
               contentType: 'application/json;  charset=utf-8',
@@ -254,15 +257,19 @@
               headers:reqHeaders,
               success: function(teachers){
                 console.log("Got teacher IDs");
-                numberOfTeachers = teachers.length;
+                numberOfTeachers = teachers.names.length;
                 console.log("number of teachers:", numberOfTeachers);
 
-                var forum2 = document.getElementById("thursday teachers");
                 var forum1 = document.getElementById("wednesday teachers");
+                var forum2 = document.getElementById("thursday teachers");
 
-                while (forum1.firstChild || forum2.firstChild) {
-                  forum1.removeChild(forum1.firstChild);
-                  forum2.removeChild(forum2.firstChild);
+                if(!enrolledWednesday){
+                  while(forum1.firstChild)
+                    forum1.removeChild(forum1.firstChild);
+                }
+                if(!enrolledThursday){
+                  while(forum2.firstChild)
+                    forum2.removeChild(forum2.firstChild);
                 }
 
                 for(var x = numberOfTeachers; x>0; x--){
@@ -296,6 +303,7 @@
                   if(!enrolledThursday){
                     forum2.appendChild(buttonthing2);
                   }
+
                 }
 
               },
