@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <!-- used to allow ajax calls from passing thru -->
+  	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  	<!-- ref to jquery -->
+  	<script
+  		src="http://code.jquery.com/jquery-3.3.1.js"
+  		integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  		crossorigin="anonymous">
+  	</script>
+    <link rel="stylesheet" type="text/css" href="template.css">
+  </head>
+  <input type="button" value="Logout" style="margin: 0px; padding: 0px; width: 60px; position: absolute; top: 15px; right: 15px; background:none;">
+
+  <div class = "form">
+    <h1>Access Portal : <span id = "nameVariable"></span></h1>
+  </div>
+
+<div class = "form" id="wednesday teachers">
+    <h1><span id = "wednesdayDate"></span></h1>
+
+    <label class="container">Teacher 1
+      <input type="checkbox">
+      <span class="checkmark"></span>
+    </label>
+</div>
+
+<div class = "form" id="thursday teachers">
+
+    <h1><span id = "thursdayDate"></span></h1>
+
+    <label class="container">Teacher 1
+      <input type="checkbox">
+      <span class="checkmark"></span>
+    </label>
+
+  </div>
+
+  <script>
+
+  (function(){
+    var forum1 = document.getElementById("thursday teachers");
+    var forum2 = document.getElementById("wednesday teachers");
+    var teacherNames = ["Mrs. Sally", "Mrs. Usican", "Mr. Guntakaktaka"];
+    for(var x = teacherNames.length; x>0; x--){
+      var buttonthing1 = document.createElement("label");
+      buttonthing1.textContent = teacherNames[x-1];
+      buttonthing1.setAttribute("class", "container");
+
+      var checkBox = document.createElement("input");
+      checkBox.setAttribute("type", "checkbox");
+
+      var check = document.createElement("span");
+      check.setAttribute("class", "checkmark");
+
+      buttonthing1.appendChild(checkBox);
+      buttonthing1.appendChild(check);
+
+      var buttonthing2 = buttonthing1.cloneNode(true);
+      var checkBox2 = checkBox.cloneNode(true);
+      var check2 = check.cloneNode(true);
+      buttonthing2.textContent =  teacherNames[x-1];
+      buttonthing2.appendChild(checkBox2);
+      buttonthing2.appendChild(check2);
+
+      forum1.appendChild(buttonthing1);
+      forum2.appendChild(buttonthing2);
+    }
+
+  })();
+
+  </script>
+</html>

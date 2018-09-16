@@ -7,7 +7,14 @@ const bcrypt = require('bcryptjs');
 var {Teacher} = require('./teacher');
 
 var UserSchema = new mongoose.Schema({
-  name:{
+  firstName:{
+    type:String,
+    require:true,
+    trim:true,
+    minlength:1,
+    unique:false
+  },
+  lastName:{
     type:String,
     require:true,
     trim:true,
@@ -31,10 +38,6 @@ var UserSchema = new mongoose.Schema({
     type:String,
     require: true,
     minlength: 6
-  },
-  access: {
-    type: String,
-    require: true
   },
   token:{
     type:String,
@@ -80,6 +83,7 @@ UserSchema.methods.removeToken = function(tokenArgument){
   });
 };
 
+//Add teacher, takes in teacher email, adds teacher ID to student doc
 UserSchema.methods.addTeacher = function(teacherEmail){
   var user = this;
   var found = -10;
@@ -104,6 +108,12 @@ UserSchema.methods.addTeacher = function(teacherEmail){
   });
 };
 
+//Get all teacher ID's from student doc
+UserSchema.methods.getTeachers = function(){
+  var user = this;
+  return user.teachers;
+};
+
 UserSchema.statics.findByToken = function(token){
   var User = this; //Get the user model itself
   var decoded;
@@ -120,7 +130,6 @@ UserSchema.statics.findByToken = function(token){
   return User.findOne({
     _id: decoded._id,
     token: token,  //To query something thats nested, like tokens.token, you need to wrap it in quotes
-    access: 'auth'
   });
 };
 
@@ -128,13 +137,15 @@ UserSchema.statics.findByCredentials = function(email, password){
   var User = this;
 
 //first query the email using .findOne() to find a document with the same email.
-  return User.findOne({email}).then((user) => {
+  return User.findOne({email:email}).then((user) => {
     if(!user){
+      console.log("no user found");
       return Promise.reject(); //run the catch call wherever this method is called
     }
 
     return new Promise((resolve, reject)=>{ //bcrypt uses callbacks, not promises. So we need to make our own promise and call bcrypt inside. Then reject or resolve the promise based on what we want.
       bcrypt.compare(password, user.password,(err, res)=>{
+        console.log("entering compare command in user.js");
         if(res){
           resolve(user);    //If res is true, passwords match, and so send back the user we found
         } else {

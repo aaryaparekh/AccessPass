@@ -27,12 +27,11 @@ var ScheduleSchema = new mongoose.Schema({
 
 });
 
-//Check to see if document is already made, if made then just add student.
 ScheduleSchema.statics.findSchedule = function(someTeacherID, someDate){
   var Schedule = this;
 
   return Schedule.findOne({
-    date: getNextDate(3),
+    date: getNextDate(someDate),
     teacherID: someTeacherID
   }).then((schedule) => {
     if (!schedule) {
@@ -40,7 +39,22 @@ ScheduleSchema.statics.findSchedule = function(someTeacherID, someDate){
     }
     return schedule;
   });
-}
+}   
+
+ScheduleSchema.statics.checkIfStudentIsInSchedule = function(someTeacherID, someDate, someStudentID){
+  var schedule = this;
+
+  return schedule.findOne({
+    date: someDate,
+    teacherID: someTeacherID,
+    students:someStudentID
+  }).then((schedule)=>{
+    if(!schedule){
+      return Promise.reject();
+    }
+    return schedule;
+  });
+};
 
 //Date Generation. Using Moment.js API.
 var getNextDate = function(day){ //day being 0 for sunday 6 for saturday

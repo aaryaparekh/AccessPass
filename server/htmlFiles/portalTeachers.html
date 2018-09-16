@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <!-- used to allow ajax calls from passing thru -->
+  	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  	<!-- ref to jquery -->
+  	<script
+  		src="https://code.jquery.com/jquery-3.3.1.js"
+  		integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  		crossorigin="anonymous">
+  	</script>
+    <link rel="stylesheet" type="text/css" href="template.css">
+  </head>
+  <a href = "/"><input type="button" value="Logout" style="margin: 0px; padding: 0px; width: 60px; position: absolute; top: 15px; right: 15px; background:none;"></a>
+
+  <div class = "portal-heading">
+    <h1>Teacher Portal: <span id = "nameVariable"></span></h1>
+  </div>
+
+  <br/>
+
+  <div class = "portal-div">
+
+    <h1><span id = "wednesdayDate"></span></h1>
+    <h2 id="wednesdayStudents"></h2>
+  </div>
+
+  <br/>
+
+  <div class = "portal-div">
+
+    <h1><span id = "thursdayDate"></span></h1>
+    <h2 id="thursdayStudents"></h2>
+  </div>
+  <script>
+  //Get name function, ambigious so will fire imediately...
+    (function() {
+      $.ajax({
+        contentType: 'application/json;  charset=utf-8',
+        type: "GET",
+        url: "https://accessspasstest.herokuapp.com/teachers/getName",
+        headers:reqHeaders,
+        success: function(name){
+          console.log(name);
+          document.getElementById("nameVariable").innerHTML = name;
+        },
+        error: function(){
+          console.log("get name failed...");
+        }
+      });
+    })();
+
+    //Get Dates...
+    (function(){
+      $.ajax({
+        contentType: 'application/json;  charset=utf-8',
+        type: "GET",
+        url: "https://accessspasstest.herokuapp.com/getNextDate",
+        headers:reqHeaders,
+        success: function(dates){
+          console.log("Got dates");
+          document.getElementById("wednesdayDate").innerHTML = dates[0];
+          document.getElementById("thursdayDate").innerHTML = dates[1];
+
+        },
+        error: function(){
+          console.log("getTeachersNames failed...");
+        }
+      });
+    })();
+
+    //get students for wed and thursday
+    $.ajax({
+      contentType: 'application/json;  charset=utf-8',
+      type: "POST",
+      url: "https://accessspasstest.herokuapp.com/schedule/getSchedule",
+      data:JSON.stringify({day:3}),
+      dataType:"text",
+      headers:reqHeaders,
+      success: function(students){
+          console.log(students)
+        for(var x = students.length; x>0; x--){
+          console.log(students[x-1]);
+          document.getElementById("wednesdayStudents").innerHTML += "\n  - "+students[x-1];
+        }
+      },
+      error: function(){
+        document.getElementById("wednesdayStudents").innerHTML = "Something went wrong...";
+      }
+    });
+
+    $.ajax({
+      contentType: 'application/json;  charset=utf-8',
+      type: "POST",
+      url: "https://accessspasstest.herokuapp.com/schedule/getSchedule",
+      data:JSON.stringify({day:4}),
+      dataType:"text",
+      headers:reqHeaders,
+      success: function(students){
+        for(var x = students.length; x>0; x--){
+          document.getElementById("thursdayStudents").innerHTML += "\n  - "+students[x-1];
+        }
+      },
+      error: function(){
+        document.getElementById("thursdayStudents").innerHTML = "Something went wrong...";
+      }
+    });
+  </script>
+</html>
+
+<script type="text/javascript">
+
+
+
+</script>

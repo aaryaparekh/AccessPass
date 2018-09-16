@@ -16,7 +16,7 @@
 <div class="login-page">
   <div class="form">
     <form class="register-form" id="register-form">
-			<h1>Register New Student</h1>
+			<h1>Register New Teacher</h1>
       <input type="text" placeholder="First Name" name="First Name"/>
 			<input type="text" placeholder="Last Name" name="Last Name"/>
       <input type="password" placeholder="password" name="password"/>
@@ -42,12 +42,12 @@
 			data:JSON.stringify({firstName:firstNameVar, lastName:lastNameVar, email:emailVar, password:passwordVar}),
 			dataType: "json",
 			type: "POST",
-			url: "https://accessspasstest.herokuapp.com/users/registerNew",
+			url: "https://accessspasstest.herokuapp.com/teachers/registerNew",
 			headers: reqHeaders,
 			success: function(data) {
 				console.log(data);
 				console.log(JSON.stringify(data, undefined, 2));
-				location.href = "https://accessspasstest.herokuapp.com/loginStudent";
+				location.href = "https://accessspasstest.herokuapp.com/loginTeachers";
 			},
 			error: function() {
 				console.log("error something isnt right when registering");
@@ -56,15 +56,11 @@
 	};
 
 	regButton.click(function(e) {
-	var emailVar = document.getElementById("register-form").elements["email"].value;
-	var passwordVar = document.getElementById("register-form").elements["password"].value;
-	var firstNameVar = document.getElementById("register-form").elements["First Name"].value;
-	var lastNameVar = document.getElementById("register-form").elements["Last Name"].value;
-	console.log("email", emailVar);
-	console.log("pass", passwordVar);
-	console.log("firstName", firstNameVar);
-	console.log("lastName", lastNameVar);
-	regRequest(emailVar, passwordVar, firstNameVar, lastNameVar);
+		var emailVar = document.getElementById("register-form").elements["email"].value;
+		var passwordVar = document.getElementById("register-form").elements["password"].value;
+		var firstNameVar = document.getElementById("register-form").elements["First Name"].value;
+		var lastNameVar = document.getElementById("register-form").elements["Last Name"].value;
+		regRequest(emailVar, passwordVar, firstNameVar, lastNameVar);
 	});
 </script>
 

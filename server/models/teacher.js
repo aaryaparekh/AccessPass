@@ -5,7 +5,14 @@ const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
 var TeacherSchema = new mongoose.Schema({
-  name:{
+  firstName:{
+    type:String,
+    require:true,
+    trim:true,
+    minlength:1,
+    unique:false
+  },
+  lastName:{
     type:String,
     require:true,
     trim:true,
@@ -92,6 +99,14 @@ TeacherSchema.methods.generateSignUpKey = function(){
   // return user.save().then(()=>{
   //   return key;
   // });
+};
+
+//given teacher ID, get the name of the teacher
+TeacherSchema.statics.getTeacherName = function(teacherID){
+  var User = this;
+  return User.findOne({
+    _id: teacherID
+  });
 };
 
 TeacherSchema.statics.findByToken = function(token){

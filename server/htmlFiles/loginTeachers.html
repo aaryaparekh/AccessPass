@@ -5,9 +5,6 @@
 	<!-- used to allow ajax calls from passing thru -->
 	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 	<!-- ref to jquery -->
-	<!-- http://code.jquery.com/jquery-3.3.1.js -->
-	<!-- sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60= -->
-	<!-- integrity="sha384-R4/ztc4ZlRqWjqIuvf6RX5yb/v90qNGx6fS48N0tRxiGkqveZETq72KgDVJCp2TC" -->
 	<script
 		src="https://code.jquery.com/jquery-3.3.1.js"
 		integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
@@ -20,8 +17,7 @@
 	<div class="login-page">
 	  <div class="form">
 	    <form class="login-form" id="login-form">
-				<h3 id ="loginError" style="display:none;">Incorrect Email or Password</h3>
-				<h1>Student Login</h1>
+				<h1>Teacher Login</h1>
 	      <input type="text" placeholder="email" name="email"/>
 	      <input type="password" placeholder="password" name="password"/>
 	      <input type="button" id="login-button" value="Login"/>
@@ -40,21 +36,24 @@
 
 	// This is a POST request
 	var loginRequest = function(emailVar, passwordVar) {
+
 		$.ajax({
 			contentType: 'application/json; charset=utf-8',
 			data:JSON.stringify({email:emailVar, password:passwordVar}),
 			dataType: "json",
 			type: "POST",
-			url: "https://accessspasstest.herokuapp.com/users/login",
+			url: "https://accessspasstest.herokuapp.com/teachers/login",
 			headers: reqHeaders,
 			success: function(data) {
+				console.log("Return value:", data);
 				reqHeaders = {"x-auth":data.authHeader};
+				console.log("reqHeaders", reqHeaders);
 
 				//location.href = "https://accessspasstest.herokuapp.com/portal"
 				$.ajax({
 					contentType: 'application/json; charset=utf-8',
 					type: "GET",
-					url: "https://accessspasstest.herokuapp.com/loadPortal",
+					url: "https://accessspasstest.herokuapp.com/loadPortalTeachers",
 					headers: reqHeaders,
 					success: function(htmlPage) {
 						$("body").html(htmlPage);
@@ -65,8 +64,7 @@
 				})
 			},
 			error: function() {
-				$('#loginError').fadeIn(500);
-				Console.log("Incorrect email or password");
+				console.log("error something isnt right");
 			}
 		});
 
@@ -78,40 +76,6 @@
 		var passwordVar = document.getElementById("login-form").elements["password"].value;
 		loginRequest(emailVar, passwordVar);
 	});
-
-	// //Once the user succesfully logs in and all new elements are loaded in
-	// //initizalize new methods and variables.
-	// var addTeacherButton;
-	// var addNewTeacher;
-	// var loadPortal = function(){
-	//
-	// 	addTeacherButton = $("#add-new-teacher");
-	//
-	// 	addNewTeacher = function(emailVar){
-	// 		$.ajax({
-	// 			contentType: 'application/json;  charset=utf-8',
-	// 			data:JSON.stringify({teacherEmail:emailVar}),
-	// 			dataType:"text",
-	// 			type:"POST",
-	// 			url:"https://accessspasstest.herokuapp.com/addTeacher",
-	// 			headers:  reqHeaders,
-	// 			success: function(data){
-	// 				console.log("Added Teacher", data);
-	// 			},
-	// 			error: function(){
-	// 				console.log("error with adding teacher");
-	// 			}
-	// 		});
-	// 	}
-	//
-	// 	addTeacherButton.click(function(e){
-	// 		console.log(reqHeaders);
-	// 		var email = document.getElementById("teacherEmail").value;
-	// 		console.log(email);
-	// 		addNewTeacher(email);
-	// 	});
-	//
-	// }
 </script>
 
 </html>
