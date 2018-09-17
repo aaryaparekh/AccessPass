@@ -5,9 +5,6 @@
 	<!-- used to allow ajax calls from passing thru -->
 	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 	<!-- ref to jquery -->
-	<!-- http://code.jquery.com/jquery-3.3.1.js -->
-	<!-- sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60= -->
-	<!-- integrity="sha384-R4/ztc4ZlRqWjqIuvf6RX5yb/v90qNGx6fS48N0tRxiGkqveZETq72KgDVJCp2TC" -->
 	<script
 		src="https://code.jquery.com/jquery-3.3.1.js"
 		integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
@@ -66,7 +63,7 @@
 			},
 			error: function() {
 				$('#loginError').fadeIn(500);
-				Console.log("Incorrect email or password");
+				console.log("Incorrect email or password");
 			}
 		});
 

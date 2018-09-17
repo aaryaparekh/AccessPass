@@ -117,7 +117,7 @@
           console.log("Got teacher IDs");
           numberOfTeachers = teachers.names.length;
           console.log("number of teachers:", numberOfTeachers);
-
+          console.log("teachers.teacherIDs: "+teachers.teacherIDs);
           var forum2 = document.getElementById("thursday teachers");
           var forum1 = document.getElementById("wednesday teachers");
 
@@ -129,7 +129,7 @@
             var checkBox = document.createElement("input");
             checkBox.setAttribute("type", "checkbox");
             checkBox.id = teachers.names[x-1] + " wednesday";
-            checkBox.setAttribute("onchange", "addStudentToSchedule(\""+checkBox.id+"\",\""+teachers.teacherIDs[x-1]+"\",3)");
+            checkBox.setAttribute("onchange", "addStudentToSchedule(\""+checkBox.id+"\",\""+teachers.teacherIDs[numberOfTeachers-x]+"\",3)");
 
             var check = document.createElement("span");
             check.setAttribute("class", "checkmark");
@@ -140,7 +140,7 @@
             var buttonthing2 = buttonthing1.cloneNode(true);
             var checkBox2 = checkBox.cloneNode(true);
             checkBox2.id = teachers.names[x-1]+ " thursday";
-            checkBox2.setAttribute("onchange", "addStudentToSchedule(\""+checkBox2.id+"\",\""+teachers.teacherIDs[x-1]+"\",4)");
+            checkBox2.setAttribute("onchange", "addStudentToSchedule(\""+checkBox2.id+"\",\""+teachers.teacherIDs[numberOfTeachers-x]+"\",4)");
             var check2 = check.cloneNode(true);
             buttonthing2.textContent =  teachers.names[x-1];
             buttonthing2.appendChild(checkBox2);
@@ -249,69 +249,188 @@
           //    forum1.removeChild(forum1.firstChild);
           //    forum2.removeChild(forum2.firstChild);
           //  }
-          (function(){
+          (function() {
             $.ajax({
               contentType: 'application/json;  charset=utf-8',
               type: "GET",
-              url: "https://accessspasstest.herokuapp.com/users/getTeachersNames",
+              url: "https://accessspasstest.herokuapp.com/users/getInfo",
               headers:reqHeaders,
-              success: function(teachers){
-                console.log("Got teacher IDs");
-                numberOfTeachers = teachers.names.length;
-                console.log("number of teachers:", numberOfTeachers);
+              success: function(info){
+                console.log("getInfo function: ",info);
+                document.getElementById("nameVariable").innerHTML = info.name;
 
-                var forum1 = document.getElementById("wednesday teachers");
-                var forum2 = document.getElementById("thursday teachers");
-
-                if(!enrolledWednesday){
-                  while(forum1.firstChild)
-                    forum1.removeChild(forum1.firstChild);
+                if(info.wednesday){
+                  enrolledWednesday = true;
+                  $.ajax({
+                    contentType: 'application/json;  charset=utf-8',
+                    type: "POST",
+                    url: "https://accessspasstest.herokuapp.com/users/getOneTeacherName",
+                    data:JSON.stringify({teacherID:info.wednesdayTeacherID}),
+                    dataType:"text",
+                    headers:reqHeaders,
+                    success: function(name){
+                      document.getElementById("wednesdaySignedUp").innerHTML = "You are enrolled in "+name;
+                    },
+                    error: function(){
+                      document.getElementById("wednesdaySignedUp").innerHTML = "Something went wrong...";
+                    }
+                  });
+                }else{
+                  enrolledWednesday = false;
                 }
-                if(!enrolledThursday){
-                  while(forum2.firstChild)
-                    forum2.removeChild(forum2.firstChild);
+
+                if(info.thursday){
+                  enrolledThursday = true;
+                  $.ajax({
+                    contentType: 'application/json;  charset=utf-8',
+                    type: "POST",
+                    url: "https://accessspasstest.herokuapp.com/users/getOneTeacherName",
+                    data:JSON.stringify({teacherID:info.thursdayTeacherID}),
+                    dataType:"text",
+                    headers:reqHeaders,
+                    success: function(name){
+                      document.getElementById("thursdaySignedUp").innerHTML = "You are enrolled in "+name;
+                    },
+                    error: function(){
+                      document.getElementById("thursdaySignedUp").innerHTML = "Something went wrong...";
+                    }
+                  });
+                }else{
+                  enrolledThursday = false;
                 }
 
-                for(var x = numberOfTeachers; x>0; x--){
-                  var buttonthing1 = document.createElement("label");
-                  buttonthing1.textContent = teachers.names[x-1];
-                  buttonthing1.setAttribute("class", "container");
+                //Add Teacher Button
+                $.ajax({
+                  contentType: 'application/json;  charset=utf-8',
+                  type: "GET",
+                  url: "https://accessspasstest.herokuapp.com/users/getTeachersNames",
+                  headers:reqHeaders,
+                  success: function(teachers){
+                    console.log("Got teacher IDs");
+                    numberOfTeachers = teachers.names.length;
+                    console.log("number of teachers:", numberOfTeachers);
 
-                  var checkBox = document.createElement("input");
-                  checkBox.setAttribute("type", "checkbox");
-                  checkBox.id = teachers.names[x-1] + " wednesday";
-                  checkBox.setAttribute("onchange", "addStudentToSchedule(\""+checkBox.id+"\",\""+teachers.teacherIDs[x-1]+"\",3)");
+                    var forum1 = document.getElementById("wednesday teachers");
+                    var forum2 = document.getElementById("thursday teachers");
 
-                  var check = document.createElement("span");
-                  check.setAttribute("class", "checkmark");
+                    if(!enrolledWednesday){
+                      while(forum1.firstChild)
+                        forum1.removeChild(forum1.firstChild);
+                    }
+                    if(!enrolledThursday){
+                      while(forum2.firstChild)
+                        forum2.removeChild(forum2.firstChild);
+                    }
 
-                  buttonthing1.appendChild(checkBox);
-                  buttonthing1.appendChild(check);
+                    for(var x = numberOfTeachers; x>0; x--){
+                      var buttonthing1 = document.createElement("label");
+                      buttonthing1.textContent = teachers.names[x-1];
+                      buttonthing1.setAttribute("class", "container");
 
-                  var buttonthing2 = buttonthing1.cloneNode(true);
-                  var checkBox2 = checkBox.cloneNode(true);
-                  checkBox2.id = teachers.names[x-1]+ " thursday";
-                  checkBox2.setAttribute("onchange", "addStudentToSchedule(\""+checkBox2.id+"\",\""+teachers.teacherIDs[x-1]+"\",4)");
-                  var check2 = check.cloneNode(true);
-                  buttonthing2.textContent =  teachers.names[x-1];
-                  buttonthing2.appendChild(checkBox2);
-                  buttonthing2.appendChild(check2);
+                      var checkBox = document.createElement("input");
+                      checkBox.setAttribute("type", "checkbox");
+                      checkBox.id = teachers.names[x-1] + " wednesday";
+                      checkBox.setAttribute("onchange", "addStudentToSchedule(\""+checkBox.id+"\",\""+teachers.teacherIDs[numberOfTeachers-x]+"\",3)");
 
-                  if(!enrolledWednesday){
-                    forum1.appendChild(buttonthing1);
+                      var check = document.createElement("span");
+                      check.setAttribute("class", "checkmark");
+
+                      buttonthing1.appendChild(checkBox);
+                      buttonthing1.appendChild(check);
+
+                      var buttonthing2 = buttonthing1.cloneNode(true);
+                      var checkBox2 = checkBox.cloneNode(true);
+                      checkBox2.id = teachers.names[x-1]+ " thursday";
+                      checkBox2.setAttribute("onchange", "addStudentToSchedule(\""+checkBox2.id+"\",\""+teachers.teacherIDs[numberOfTeachers-x]+"\",4)");
+                      var check2 = check.cloneNode(true);
+                      buttonthing2.textContent =  teachers.names[x-1];
+                      buttonthing2.appendChild(checkBox2);
+                      buttonthing2.appendChild(check2);
+
+                      if(!enrolledWednesday){
+                        forum1.appendChild(buttonthing1);
+                      }
+                      if(!enrolledThursday){
+                        forum2.appendChild(buttonthing2);
+                      }
+
+                    }
+
+                  },
+                  error: function(){
+                    console.log("getTeachersNames failed...");
                   }
-                  if(!enrolledThursday){
-                    forum2.appendChild(buttonthing2);
-                  }
-
-                }
-
+                });
               },
               error: function(){
-                console.log("getTeachersNames failed...");
+                console.log("/users/getInfo failed...");
+
               }
             });
           })();
+          // (function(){
+          //   $.ajax({
+          //     contentType: 'application/json;  charset=utf-8',
+          //     type: "GET",
+          //     url: "https://accessspasstest.herokuapp.com/users/getTeachersNames",
+          //     headers:reqHeaders,
+          //     success: function(teachers){
+          //       console.log("Got teacher IDs");
+          //       numberOfTeachers = teachers.names.length;
+          //       console.log("number of teachers:", numberOfTeachers);
+          //
+          //       var forum1 = document.getElementById("wednesday teachers");
+          //       var forum2 = document.getElementById("thursday teachers");
+          //
+          //       if(!enrolledWednesday){
+          //         while(forum1.firstChild)
+          //           forum1.removeChild(forum1.firstChild);
+          //       }
+          //       if(!enrolledThursday){
+          //         while(forum2.firstChild)
+          //           forum2.removeChild(forum2.firstChild);
+          //       }
+          //
+          //       for(var x = numberOfTeachers; x>0; x--){
+          //         var buttonthing1 = document.createElement("label");
+          //         buttonthing1.textContent = teachers.names[x-1];
+          //         buttonthing1.setAttribute("class", "container");
+          //
+          //         var checkBox = document.createElement("input");
+          //         checkBox.setAttribute("type", "checkbox");
+          //         checkBox.id = teachers.names[x-1] + " wednesday";
+          //         checkBox.setAttribute("onchange", "addStudentToSchedule(\""+checkBox.id+"\",\""+teachers.teacherIDs[numberOfTeachers-x]+"\",3)");
+          //
+          //         var check = document.createElement("span");
+          //         check.setAttribute("class", "checkmark");
+          //
+          //         buttonthing1.appendChild(checkBox);
+          //         buttonthing1.appendChild(check);
+          //
+          //         var buttonthing2 = buttonthing1.cloneNode(true);
+          //         var checkBox2 = checkBox.cloneNode(true);
+          //         checkBox2.id = teachers.names[x-1]+ " thursday";
+          //         checkBox2.setAttribute("onchange", "addStudentToSchedule(\""+checkBox2.id+"\",\""+teachers.teacherIDs[numberOfTeachers-x]+"\",4)");
+          //         var check2 = check.cloneNode(true);
+          //         buttonthing2.textContent =  teachers.names[x-1];
+          //         buttonthing2.appendChild(checkBox2);
+          //         buttonthing2.appendChild(check2);
+          //
+          //         if(!enrolledWednesday){
+          //           forum1.appendChild(buttonthing1);
+          //         }
+          //         if(!enrolledThursday){
+          //           forum2.appendChild(buttonthing2);
+          //         }
+          //
+          //       }
+          //
+          //     },
+          //     error: function(){
+          //       console.log("getTeachersNames failed...");
+          //     }
+          //   });
+          // })();
         },
         error: function(){
           console.log("error with adding teacher");

@@ -4,7 +4,6 @@ const _=require('lodash');
 const moment = require('moment');
 moment().format();
 
-
 //import local stuff
 //require the mongoose config files
 var {mongoose} = require('./db/mongoose.js');
@@ -21,8 +20,11 @@ var app = express();
 app.use(bodyParser.json()); //config middlewear for express
 app.use(express.static(__dirname+'/htmlFiles')); //config middlewear for express
 
+//CORS FOR LOCAL TESTING
+var cors = require('cors');
+app.use(cors({credentials:true, origin:true}));
 //variable to hold the port
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000 || 8000 || 8080;
 
 //For testing purposes
 app.post('/test', (req, res)=>{
@@ -278,36 +280,61 @@ app.post('/schedule/addStudent', authenticate, (req, res)=>{
 
 //Return students that are part of a schedule given teacher id and day
 //day = 3 is wed, day = 4 is thur
-app.post('/schedule/getSchedule', authenticateTeacher, (req, res)=>{
-  var body = _.pick(req.body, ['day']);
-
+app.get('/schedule/getSchedule', authenticateTeacher, (req, res)=>{
+  var wednesdayStudents = [];
+  var thursdayStudents = [];
+  //Wednesay
   Schedule.findOne({
-    date: getNextDate(body.day),
+    date: getNextDate(3),
     teacherID:req.teacher._id
   }).then((schedule)=>{
-      var returnArray = [];
     if(!schedule){
-      console.log("no schedule");
-      returnArray.push("No Students");
-      res.status(200).send(returnArray);
+      console.log("no schedule wednesday");
+      wednesdayStudents.push("No Students Signed Up");
     }else{
-      console.log("Schedule found");
+      console.log("wednesday Schedule found");
       for(var x = schedule.students.length; x>0; x--){
         User.findOne({
           _id:schedule.students[x-1]
         }).then((student)=>{
-          returnArray.push(student.firstName + " " + student.lastName);
+          wednesdayStudents.push(student.firstName + " " + student.lastName);
         }, (error)=>{
           console.log("something wrong with getting student names");
         });
-
       }
-      setTimeout(() => res.status(200).send(returnArray), 1100);
     }
   }, (error)=>{
     console.log("Some error");
     res.status(400).send();
   });
+
+  //thursday
+  Schedule.findOne({
+    date: getNextDate(4),
+    teacherID:req.teacher._id
+  }).then((schedule)=>{
+    if(!schedule){
+      console.log("no schedule thursday");
+      thursdayStudents.push("No Students Signed Up");
+    }else{
+      console.log("thursday Schedule found");
+      for(var x = schedule.students.length; x>0; x--){
+        User.findOne({
+          _id:schedule.students[x-1]
+        }).then((student)=>{
+          thursdayStudents.push(student.firstName + " " + student.lastName);
+        }, (error)=>{
+          console.log("something wrong with getting student names");
+        });
+      }
+    }
+  }, (error)=>{
+    console.log("Some error");
+    res.status(400).send();
+  });
+
+  setTimeout(() => res.status(200).send({"wednesdayStudents":wednesdayStudents, "thursdayStudents":thursdayStudents}), 2000);
+
 });
 
 app.post('/checkIfStudentIsInSchedule', authenticate, (req, res)=>{

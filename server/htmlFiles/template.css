@@ -31,6 +31,12 @@ h1 {
     text-align: center;
 }
 
+h2 {
+  font-family: "Roboto";
+  color: black;
+  text-align: center;
+}
+
 h3 {
     font-family: "Roboto";
     color: red;
