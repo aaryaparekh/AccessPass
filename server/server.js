@@ -12,9 +12,11 @@ const {ObjectID} = require('mongodb');
 var {User} = require('./models/user');
 var {Teacher} = require('./models/teacher');
 var {Schedule} = require('./models/schedules2018-2019');
+var {Admin} = require('./models/admin');
 //middlewear
 var {authenticate} = require('./middlewear/authenticate');
-var {authenticateTeacher} = require('./middlewear/authenticateTeacher')
+var {authenticateTeacher} = require('./middlewear/authenticateTeacher');
+var {authenticateAdmin} = require('./middlewear/authenticateAdmin');
 //express into variable so we can make changes to it
 var app = express();
 app.use(bodyParser.json()); //config middlewear for express
@@ -52,6 +54,10 @@ app.get('/loginTeachers', (req, res)=>{
   res.sendFile(__dirname+'/htmlFiles/loginTeachers.html');
 });
 
+app.get('/loginAdmin', (req, res)=>{
+  res.sendFile(__dirname+'/htmlFiles/loginAdmin.html');
+});
+
 app.get('/register', (req, res)=>{
   res.sendFile(__dirname+'/htmlFiles/registerRedirect.html');
 });
@@ -64,12 +70,20 @@ app.get('/registerTeachers', (req, res)=>{
   res.sendFile(__dirname+'/htmlFiles/registerTeachers.html');
 });
 
+app.get('/registerAdmin', (req, res)=>{
+  res.sendFile(__dirname+'/htmlFiles/registerAdmin.html');
+})
+
 app.get('/loadPortal', authenticate, (req, res)=>{
     res.sendFile(__dirname+'/htmlFiles/portal.html');
 });
 
 app.get('/loadPortalTeachers', authenticateTeacher, (req, res)=>{
   res.sendFile(__dirname+'/htmlFiles/portalTeachers.html');
+});
+
+app.get('/loadPortalAdmin', authenticateAdmin, (req, res)=>{
+  res.sendFile(__dirname+'/htmlFiles/portalAdmin.html');
 });
 
 //Registering new student
@@ -256,24 +270,33 @@ app.post('/schedule/addStudent', authenticate, (req, res)=>{
   Schedule.findSchedule(requestData.teacherID, getNextDate(requestData.date)).then((schedule)=>{
       if(schedule.students.length){
         index = schedule.students.indexOf(req.user._id);
-        if(index == -1)
+        if(index == -1){
           schedule.students.push(req.user._id);
+          schedule.studentsNames.push(req.user.firstName + " " +req.user.lastName);
+        }
       } else {
         schedule.students.push(req.user._id);
+        schedule.studentsNames.push(req.user.firstName + " " +req.user.lastName);
       }
       schedule.save().then(()=>{
          res.status(200).send(schedule);
        });
     }, ()=>{
-    return new Schedule({
-      date: getNextDate(requestData.date),                    //CHANGE THIS TO ADD DATE BASED ON WHAT USER SELECTS
-      teacherID: requestData.teacherID,
-      students: [req.user._id]
-    }).save().then((schedule)=>{
-      res.status(200).send(schedule);
-    });
-
-    res.status(400).send();
+      Teacher.findOne({
+        "_id":requestData.teacherID
+      }).then((teacher)=>{
+        return new Schedule({
+          date: getNextDate(requestData.date),
+          teacherID: requestData.teacherID,
+          teacherName: teacher.firstName + " " +teacher.lastName,
+          students: [req.user._id],
+          studentsNames: [req.user.firstName + " " + req.user.lastName]
+        }).save().then((schedule)=>{
+          res.status(200).send(schedule);
+        });
+      }, ()=>{
+        res.status(400).send();
+      })
   });
 
 });
@@ -358,6 +381,135 @@ app.post('/addTeacher', authenticate, (req, res)=>{
   });
 });
 
+// Admin Routes
+//Registering new admin -------------------
+app.post('/admin/registerNew', (req, res)=>{
+  var body = _.pick(req.body, ['firstName', 'lastName', 'email', 'password']);
+  var adminKey = _.pick(req.body, ['adminKey']);
+  if(adminKey.adminKey == 'adminKey'){             //ADMIN KEY
+    var admin = new Admin(body);
+    console.log("Admin", admin);
+    admin.save().then(()=>{
+      return admin.generateAuthToken();
+      console.log("Generated token")
+    }).then((token)=>{
+      res.header('x-auth', token).send(admin);
+    }).catch((e)=>{
+      res.status(400).send(e);
+    });
+  }else{
+    console.log("Admin key isn't correct");
+    res.status(401).send("Admin key incorrect");
+  }
+
+});
+
+//Loggin in for admin
+app.post('/admin/login', (req, res)=>{
+  var body = _.pick(req.body, ['email', 'password']);
+
+  Admin.findByCredentials(body.email, body.password).then((admin)=>{
+    return admin.generateAuthToken().then((token)=>{
+      res.header('x-auth', token).status(200).send({'authHeader': token});
+    });
+  }).catch((e)=>{
+    res.status(400).send();
+  });
+});
+
+//Admin Querying
+app.post('/admin/queryDatabase', authenticateAdmin,(req, res)=>{
+  var body = _.pick(req.body, ['studentEmail', 'teacherEmail', 'date']);
+  studentID = "";
+  teacherID = "";
+  dateVar = "";
+  schedulesVar = {"studentNames":["None"], "teacherName":"None", "date":"None"}
+
+  students = [];  //2d
+  teachers = [];  //1d
+  dates = [];     //1d
+
+  console.log("Initial input: ", body.studentEmail, body.teacherEmail, body.date);
+
+  User.findOne({
+    "email":body.studentEmail
+  }).then((student)=>{
+    studentID = student._id;
+  }, (error)=>{
+    console.log("error in admin/queryDatabase");
+  });
+
+  Teacher.findOne({
+    "email":body.teacherEmail
+  }).then((teacher)=>{
+    teacherID = teacher._id;
+  }, (error)=>{
+    console.log("error in admin/queryDatabase")
+  });
+
+  dateVar = body.date;
+
+  setTimeout(() => Schedule.queryDatabase(studentID, teacherID, dateVar).then((schedules)=>{
+    console.log("Querying done");
+    if(schedules)
+      schedulesVar = schedules;
+
+    for(var x = schedulesVar.length; x>0; x--){
+      students.push(schedulesVar[x-1].studentsNames);
+    }
+    for(var x = schedulesVar.length; x>0; x--){
+      teachers.push(schedulesVar[x-1].teacherName);
+    }
+    for(var x = schedulesVar.length;x>0;x--){
+      dates.push(schedulesVar[x-1].date);
+    }
+  }, ()=>{
+    res.status(400).send("Error with querying scheduels");
+  }), 2000);
+
+  setTimeout(() => res.status(200).send({"students":students, "teachers":teachers, "dates":dates}), 4000);
+
+
+
+  // User.findOne({
+  //   "email":body.studentEmail
+  // }).then((student)=>{
+  //   if(!student){
+  //     student = "Something";
+  //     student._id = "Nothing found";
+  //   }else{
+  //     studentEmailVar = student;
+  //   }
+  //   Teacher.findOne({
+  //     "email":body.teacherEmail
+  //   }).then((teacher)=>{
+  //     if(!teacher){
+  //       teacher = "Something";
+  //       teacher._id = "Nothing found";
+  //     }else{
+  //       teacherEmailVar = teacher;
+  //     }
+  //     //call the date API to convert date into format we want right Here
+  //     console.log(student._id, teacher._id, body.date);
+  //     Schedule.queryDatabase(student._id, teacher._id, body.date).then((schedule)=>{
+  //       var students = []; //2d Array
+  //       var teachers = []; //1d Array
+  //       var dates = [];  //1d Array
+  //
+  //       setTimeout(() => res.status(200).send(schedule), 2000);
+  //     }).catch((e)=>{
+  //       res.status(400).send('Something went wrong when getting schedule');
+  //     });
+  //   })
+  // })
+});
+
+//get admin name
+app.get('/admin/getName', authenticateAdmin, (req, res)=>{
+  console.log(req.admin.name);
+  res.send(req.admin.firstName + " " + req.admin.lastName);
+});
+//----------------------------------------
 app.get('/getNextDate', (req, res)=>{
   var dates = [];
   dates.push(getNextDate(3));

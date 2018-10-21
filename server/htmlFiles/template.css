@@ -11,7 +11,7 @@
   width: 720px;
   margin: auto;
   padding: 0.5% 0.5% 0.5%;
-  background: #f2f2f2;
+  background: #ffffff;
   text-align: justify;
   border-radius: 10px;
 }
@@ -20,14 +20,27 @@
     width: 720px;
     padding: 2% 0.5% 2%;
     margin: auto;
-    background: #f2f2f2;
+    background: #ffffff;
     text-align: justify;
     border-radius: 10px;
 }
 
+.portal-div input {
+  font-family: "Roboto", sans-serif;
+  outline: 0;
+  background: #ffffff;
+  width: 100%;
+  border: 0;
+  margin: 0 0 0px;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
 h1 {
     font-family: "Roboto";
-    color: green;
+    color: black;
     text-align: center;
 }
 
@@ -50,12 +63,13 @@ h3 {
 .form {
   position: relative;
   z-index: 1;
-  background: #f2f2f2;
+  background: #ffffff;
   max-width: 360px;
-  margin: 0 auto 30px;
+  margin: 0 auto 15px;
   padding: 45px;
   text-align: center;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+  border-radius: 10px;
 }
 .box {
   position: relative;
@@ -78,6 +92,7 @@ h3 {
   padding: 15px;
   box-sizing: border-box;
   font-size: 14px;
+  border-radius: 10px;
 }
 
 .util {
@@ -92,7 +107,7 @@ input[type=button] {
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
   outline: 0;
-  background: #4CAF50;
+  background: #2f6a93;
   width: 100%;
   border: 0;
   padding: 15px;
@@ -101,17 +116,18 @@ input[type=button] {
   -webkit-transition: all 0.3 ease;
   transition: all 0.3 ease;
   cursor: pointer;
+  border-radius: 10px;
 }
 input[type=button]:hover {
   cursor: pointer;
-  background: #43A047;
+  background: #174768;
 }
 
 .form button {
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
   outline: 0;
-  background: #4CAF50;
+  background: #2f6a93;
   width: 100%;
   border: 0;
   padding: 15px;
@@ -120,9 +136,10 @@ input[type=button]:hover {
   -webkit-transition: all 0.3 ease;
   transition: all 0.3 ease;
   cursor: pointer;
+  border-radius: 10px;
 }
 .form button:hover,.form button:active,.form button:focus {
-  background: #43A047;
+  background: #174768;
 }
 .form .message {
   margin: 15px 0 0;
@@ -130,7 +147,7 @@ input[type=button]:hover {
   font-size: 12px;
 }
 .form .message a {
-  color: #4CAF50;
+  color: #2f6a93;
   text-decoration: none;
 }
 .form .register-form {
@@ -170,22 +187,22 @@ input[type=button]:hover {
   color: #EF3B3A;
 }
 body {
-  background: #76b852; /* fallback for old browsers */
-  background: -webkit-linear-gradient(right, #76b852, #8DC26F);
-  background: -moz-linear-gradient(right, #76b852, #8DC26F);
-  background: -o-linear-gradient(right, #76b852, #8DC26F);
-  background: linear-gradient(to left, #76b852, #8DC26F);
+  background: #2f6a93; /* fallback for old browsers */
+  background: -webkit-linear-gradient(right, #2f6a93, #174768);
+  background: -moz-linear-gradient(right, #2f6a93, #174768);
+  background: -o-linear-gradient(right, #2f6a93, #174768);
+  background: linear-gradient(to left, #2f6a93, #174768);
   font-family: "Roboto", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Customize the label (the container) */
+/* Customize the label (the container) for the checkbox */
 .container {
  font-family: "Roboto", sans-serif;
  text-transform: uppercase;
- background: #4CAF50;
- color: #f2f2f2
+ background: #2f6a93;
+ color: #f2f2f2;
  border-radius: 5px;
  padding: 15px;
  text-align: center;
@@ -199,6 +216,7 @@ body {
  -ms-user-select: none;
  user-select: none;
  border: 0;
+ border-radius:10px;
 }
 
 /* Hide the browser's default checkbox */
@@ -214,10 +232,10 @@ body {
  background-color: #eee;
 }
 
-/* On mouse-over, add a grey background color */
+/* On mouse-over*/
 .container:hover {
   cursor: pointer;
-  background: #43A047;
+  background: #174768;
 }
 
 /* When the checkbox is checked, add a blue background */

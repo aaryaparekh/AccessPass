@@ -17,15 +17,15 @@
   <div class="form">
 		<!-- DV logo -->
 		<img src="wildcatsLogo.bmp" alt="Dougherty Valley Highschool" style="width:270px;height:270px;">
-
     <form class="register-form" id="register-form">
-			<h1>Register New Teacher</h1>
+			<h1>Register New Administrator</h1>
       <input type="text" placeholder="First Name" name="First Name"/>
 			<input type="text" placeholder="Last Name" name="Last Name"/>
-      <input type="password" placeholder="password" name="password"/>
       <input type="text" placeholder="email address" name = "email"/>
+      <input type="password" placeholder="password" name="password"/>
+      <input type="text" placeholder="Admin Key" name = "adminKey"/>
       <input type="button" id="reg-button" value="Register"/>
-      <p class="message">Already registered? <a href="/loginTeachers">Sign In</a></p>
+      <p class="message">Already registered? <a href="/loginAdmin">Sign In</a></p>
     </form>
   </div>
 </div>
@@ -39,18 +39,18 @@
 	};
 
 	// This is a GET request
-	var regRequest = function(emailVar, passwordVar, firstNameVar, lastNameVar) {
+	var regRequest = function(emailVar, passwordVar, firstNameVar, lastNameVar, adminKeyVar) {
 		$.ajax({
 			contentType: 'application/json; charset=utf-8',
-			data:JSON.stringify({firstName:firstNameVar, lastName:lastNameVar, email:emailVar, password:passwordVar}),
+			data:JSON.stringify({firstName:firstNameVar, lastName:lastNameVar, email:emailVar, password:passwordVar, adminKey:adminKeyVar}),
 			dataType: "json",
 			type: "POST",
-			url: "https://accessspasstest.herokuapp.com/teachers/registerNew",
+			url: "https://accessspasstest.herokuapp.com/admin/registerNew",
 			headers: reqHeaders,
 			success: function(data) {
 				console.log(data);
 				console.log(JSON.stringify(data, undefined, 2));
-				location.href = "https://accessspasstest.herokuapp.com/loginTeachers";
+				location.href = "https://accessspasstest.herokuapp.com/loginAdmin";
 			},
 			error: function() {
 				console.log("error something isnt right when registering");
@@ -63,7 +63,8 @@
 		var passwordVar = document.getElementById("register-form").elements["password"].value;
 		var firstNameVar = document.getElementById("register-form").elements["First Name"].value;
 		var lastNameVar = document.getElementById("register-form").elements["Last Name"].value;
-		regRequest(emailVar, passwordVar, firstNameVar, lastNameVar);
+		var adminKeyVar = document.getElementById("register-form").elements["adminKey"].value;
+		regRequest(emailVar, passwordVar, firstNameVar, lastNameVar, adminKeyVar);
 	});
 </script>
 

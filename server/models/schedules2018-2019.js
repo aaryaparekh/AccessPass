@@ -21,7 +21,17 @@ var ScheduleSchema = new mongoose.Schema({
     minlength:1,
     unique:false
   },
+  teacherName:{
+    type:String,
+    require:true,
+    trim:true,
+    minlength:1,
+    unique:false
+  },
   students:{
+    type:Array
+  },
+  studentsNames:{
     type:Array
   }
 
@@ -39,7 +49,7 @@ ScheduleSchema.statics.findSchedule = function(someTeacherID, someDate){
     }
     return schedule;
   });
-}   
+}
 
 ScheduleSchema.statics.checkIfStudentIsInSchedule = function(someTeacherID, someDate, someStudentID){
   var schedule = this;
@@ -55,6 +65,59 @@ ScheduleSchema.statics.checkIfStudentIsInSchedule = function(someTeacherID, some
     return schedule;
   });
 };
+
+//Query for admin
+ScheduleSchema.statics.queryDatabase = function(studentID, teacherID, date){
+  var schedule =this;
+  console.log("Params passed to query: ", studentID, teacherID, date)
+  if(studentID && teacherID && date){
+    console.log("0");
+    return schedule.find({
+      students: studentID,
+      date: date,
+      teacherID: teacherID
+    });
+  }
+  else if(studentID && teacherID && !date){
+    console.log("1");
+    return schedule.find({
+      students: studentID,
+      teacherID: teacherID
+    });
+  }else if(studentID && date && !teacherID){
+    console.log("2");
+    return schedule.find({
+      students: studentID,
+      date: date
+    });
+  }else if(studentID && !date && !teacherID){
+    console.log("3");
+    return schedule.find({
+      students: studentID
+    });
+  }else if(teacherID && date && !studentID){
+    console.log("3");
+    return schedule.find({
+      teacherID: teacherID,
+      date: date
+    });
+  }else if(teacherID && !date && !studentID){
+    console.log("4");
+    return schedule.find({
+      teacherID: teacherID
+    });
+  }else if(date && !teacherID && !studentID){
+    console.log("5");
+    return schedule.find({
+      date: date
+    });
+  }else{
+    console.log("error in querying schedule");
+    var errorObject = [];
+    errorObject.push("No schedules found.")
+    return Promise.resolve(errorObject);
+  }
+}
 
 //Date Generation. Using Moment.js API.
 var getNextDate = function(day){ //day being 0 for sunday 6 for saturday

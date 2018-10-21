@@ -60,13 +60,11 @@ UserSchema.methods.toJSON = function(){
 //generateAuthToken for student
 UserSchema.methods.generateAuthToken = function() {
   var user = this; //Get the individual document
-  var access = 'auth';
-  var newToken = jwt.sign({_id: user._id.toHexString(), access}, 'someSecretValueToSalt').toString();
+  var newToken = jwt.sign({_id: user._id.toHexString()}, 'someSecretValueToSalt').toString();
 
   return user.update({
 
-      token: newToken,
-      access: access
+      token: newToken
 
   }).then(()=>{
     return newToken;

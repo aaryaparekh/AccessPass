@@ -16,13 +16,15 @@
 <body>
 	<div class="login-page">
 	  <div class="form">
+			<!-- DV logo -->
+      <img src="wildcatsLogo.bmp" alt="Dougherty Valley Highschool" style="width:270px;height:270px;">
 	    <form class="login-form" id="login-form">
 				<h3 id ="loginError" style="display:none;">Incorrect Email or Password</h3>
 				<h1>Student Login</h1>
 	      <input type="text" placeholder="email" name="email"/>
 	      <input type="password" placeholder="password" name="password"/>
 	      <input type="button" id="login-button" value="Login"/>
-	      <p class="message">Not registered? <a href="#">Create an account</a></p>
+	      <p class="message">Not registered? <a href="/registerStudent">Create an account</a></p>
 	    </form>
 	  </div>
 	</div>
@@ -63,7 +65,6 @@
 			},
 			error: function() {
 				$('#loginError').fadeIn(500);
-				console.log("Incorrect email or password");
 			}
 		});
 

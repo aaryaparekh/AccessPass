@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <!-- used to allow ajax calls from passing thru -->
+  	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  	<!-- ref to jquery -->
+  	<script
+  		src="https://code.jquery.com/jquery-3.3.1.js"
+  		integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  		crossorigin="anonymous">
+  	</script>
+    <link rel="stylesheet" type="text/css" href="template.css">
+  </head>
+  <a href = "/"><input type="button" value="Logout" style="margin: 0px; padding: 0px; width: 60px; position: absolute; top: 15px; right: 15px; background:none;"></a>
+
+  <div class = "form">
+    <!-- DV logo -->
+    <img src="wildcatsLogo.bmp" alt="Dougherty Valley Highschool" style="width:270px;height:270px;">
+    <h1>Administrator Portal:</h1>
+    <h1><span id = "nameVariable"></span></h1>
+  </div>
+
+  <br/>
+
+	  <div class="form">
+				<h3 id ="loginError" style="display:none;">Incorrect Email or Password</h3>
+				<h1>Enter 1 Or More Parameters To Get Back All Results With The Following Student/Teacher/Date.</h1>
+	      <input type="text" placeholder="Student Email" id="studentEmail"/>
+	      <input type="text" placeholder="Teacher Email" id="teacherEmail"/>
+        <input type="text" placeholder="Date" id="date"/>
+	      <input type="button" id="search-button" value="Search"/>
+        <h3 id ="searchError" style="display:none;">Please enter at least one search parameter.</h3>
+        <hr>
+        <h4><span id = "scheduleDisplay"></span></h4>
+	  </div>
+
+    <script>
+    //Get name function, ambigious so will fire imediately...
+      (function() {
+        $.ajax({
+          contentType: 'application/json;  charset=utf-8',
+          type: "GET",
+          url: "https://accessspasstest.herokuapp.com/admin/getName",
+          headers:reqHeaders,
+          success: function(name){
+            document.getElementById("nameVariable").innerHTML = name;
+          },
+          error: function(){
+            console.log("/admin/getName failed...");
+
+          }
+        });
+      })();
+
+      var searchButton = $("#search-button");
+      //Query Search
+      var search = function(studentEmail, teacherEmail, date){
+        $.ajax({
+          contentType: 'application/json; charset=utf-8',
+          data:JSON.stringify({studentEmail:studentEmail, teacherEmail:teacherEmail, date:date}),
+          dataType:"JSON",
+          type:"POST",
+          url:"https://accessspasstest.herokuapp.com/admin/queryDatabase",
+          headers: reqHeaders,
+          success: function(data){
+            console.log(data);
+            var display = document.getElementById("scheduleDisplay");
+            display.innerHTML = "";
+            for(var x = data.students.length; x>0; x--){
+              display.innerHTML +="<u>"+data.dates[x-1]+"</u>";
+              display.innerHTML += "<br><br><u>Teacher:</u> <br>"+data.teachers[x-1];
+              display.innerHTML += "<br><br><u>Students:</u>";
+              for(var y = 0; y<data.students[x-1].length; y++){
+                display.innerHTML +="<br>"+data.students[x-1][y];
+              }
+              display.innerHTML += "<hr>";
+
+            }
+          },
+          error: function(){
+            console.log("Something went wrong when querying schedules");
+            document.getElementById("scheduleDisplay").innerHTML = "Sorry, Something Went Wrong...";
+          }
+        });
+      }
+
+
+    	searchButton.click(function(e){
+        var studentEmail = document.getElementById("studentEmail").value;
+        var teacherEmail = document.getElementById("teacherEmail").value;
+        var date = document.getElementById("date").value;
+        if(!studentEmail && !teacherEmail && !date){
+          $('#searchError').fadeIn(500);
+        }else{
+          $('#searchError').fadeOut(0);
+          $('#scheduleDisplay').fadeOut(0);
+          document.getElementById("scheduleDisplay").innerHTML = "Loading...";
+          $('#scheduleDisplay').fadeIn(500);
+          search(studentEmail, teacherEmail, date);
+        }
+      });
+    </script>
+
+</html>

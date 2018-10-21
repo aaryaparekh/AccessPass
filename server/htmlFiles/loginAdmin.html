@@ -20,11 +20,11 @@
 				<!-- DV logo -->
 	      <img src="wildcatsLogo.bmp" alt="Dougherty Valley Highschool" style="width:270px;height:270px;">
 				<h3 id ="loginError" style="display:none;">Incorrect Email or Password</h3>
-				<h1>Teacher Login</h1>
+				<h1>Administrator Login</h1>
 	      <input type="text" placeholder="email" name="email"/>
 	      <input type="password" placeholder="password" name="password"/>
 	      <input type="button" id="login-button" value="Login"/>
-	      <p class="message">Not registered? <a href="/registerTeachers">Create an account</a></p>
+	      <p class="message">Not registered? <a href="/registerAdmin">Create an account</a></p>
 	    </form>
 	  </div>
 	</div>
@@ -45,7 +45,7 @@
 			data:JSON.stringify({email:emailVar, password:passwordVar}),
 			dataType: "json",
 			type: "POST",
-			url: "https://accessspasstest.herokuapp.com/teachers/login",
+			url: "https://accessspasstest.herokuapp.com/admin/login",
 			headers: reqHeaders,
 			success: function(data) {
 				console.log("Return value:", data);
@@ -56,7 +56,7 @@
 				$.ajax({
 					contentType: 'application/json; charset=utf-8',
 					type: "GET",
-					url: "https://accessspasstest.herokuapp.com/loadPortalTeachers",
+					url: "https://accessspasstest.herokuapp.com/loadPortalAdmin",
 					headers: reqHeaders,
 					success: function(htmlPage) {
 						$("body").html(htmlPage);
