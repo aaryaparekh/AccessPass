@@ -67,32 +67,122 @@
 
         },
         error: function(){
-          console.log("getTeachersNames failed...");
+          console.log("getNextDate failed...");
         }
       });
     })();
 
-    //get students for wed and thursday
+    var currentDate;
+    //Get current date
     $.ajax({
       contentType: 'application/json;  charset=utf-8',
       type: "GET",
-      url: "https://accessspasstest.herokuapp.com/schedule/getSchedule",
+      url: "https://accessspasstest.herokuapp.com/getCurrentDate",
       headers:reqHeaders,
-      success: function(info){
-        console.log(info);
-        for(var x = info.wednesdayStudents.length; x>0; x--){
-          console.log(info.wednesdayStudents[x-1]);
-          document.getElementById("wednesdayStudents").innerHTML += "- "+info.wednesdayStudents[x-1]+"<br />";
+      success: function(currentDate){
+
+        //get students for wed and thursday
+        $.ajax({
+          contentType: 'application/json;  charset=utf-8',
+          type: "GET",
+          url: "https://accessspasstest.herokuapp.com/schedule/getSchedule",
+          headers:reqHeaders,
+          success: function(info){
+            console.log(info);
+            wednesdayDoc = document.getElementById("wednesdayStudents");
+            thursdayDoc = document.getElementById("thursdayStudents");
+
+            for(var x = 0; x<info.wednesdayStudents.length; x++){
+
+                if(currentDate == 3){
+                  //Make sure students have signed up for wednesday, otherwise dont generate buttons
+                  if(info.wednesdayStudents[0] != "No Students Signed Up"){
+                    console.log("Info: ", info);
+                    var confirmButton = document.createElement("input");
+                    confirmButton.setAttribute("type", "button");
+                    confirmButton.id = info.wednesdayIDs[x];           //set this to student _id
+                    confirmButton.value = info.wednesdayStudents[x];
+                    console.log("Button Text: ", info.wednesdayStudents[x]);
+                    confirmButton.setAttribute("onclick", "confirmStudent(\""+info.wednesdayIDs[x]+"\",\""+3+"\",\""+(x)+"\")");
+                    //If already confirmed, Make button green and unclickable
+                    if(info.studentsConfirmedWednesday[x] === true){
+                      confirmButton.style.background = "green";
+                      confirmButton.disabled = true;
+                    }
+
+                  wednesdayDoc.appendChild(confirmButton);
+                  }else{
+                    wednesdayDoc.innerHTML += "- "+info.wednesdayStudents[x];
+                  }
+              } else {
+                wednesdayDoc.innerHTML += "- "+info.wednesdayStudents[x];
+              }
+
+              wednesdayDoc.innerHTML += "<br />"
+            }
+
+            for(var x = 0; x<info.thursdayStudents.length; x++){
+              if(currentDate == 4){
+                //Make sure students have signed up for thursday, otherwise dont generate buttons
+                if(info.thursdayStudents[0] != "No Students Signed Up"){
+                  var confirmButton = document.createElement("input");
+                  confirmButton.setAttribute("type", "button");
+                  confirmButton.id = info.thursdayIDs[x];           //set this to student _id
+                  confirmButton.value = info.thursdayStudents[x];
+                  console.log("Button Text: ", info.thursdayStudents[x]);
+                  confirmButton.setAttribute("onclick", "confirmStudent(\""+info.thursdayIDs[x]+"\",\""+4+"\",\""+(x)+"\")");
+                  //If already confirmed, Make button green and unclickable
+                  if(info.studentsConfirmedThursday[x] === true){
+                    confirmButton.style.background = "green";
+                    confirmButton.disabled = true;
+                  }
+                  console.log("Created button: Name "+info.thursdayStudents[x]+" Index "+(x)+" Confirmed: "+info.studentsConfirmedThursday[x]);
+                thursdayDoc.appendChild(confirmButton);
+              }else{
+                thursdayDoc.innerHTML += "- "+info.thursdayStudents[x];
+              }
+          } else {
+            thursdayDoc.innerHTML += "- "+info.thursdayStudents[x];
+          }
+
+          thursdayDoc.innerHTML += "<br />"
         }
-        for(var x = info.thursdayStudents.length; x>0; x--){
-          console.log(info.thursdayStudents[x-1]);
-          document.getElementById("thursdayStudents").innerHTML += "- "+info.thursdayStudents[x-1]+"<br />";
-        }
+          },
+          error: function(){
+            document.getElementById("wednesdayStudents").innerHTML = "Something went wrong...";
+            document.getElementById("thursdayStudents").innerHTML = "Something went wrong...";
+          }
+        });
+
       },
       error: function(){
         document.getElementById("wednesdayStudents").innerHTML = "Something went wrong...";
+        document.getElementById("thursdayStudents").innerHTML = "Something went wrong...";
       }
     });
+
+    function confirmStudent(studentID, day, index){
+      var button = document.getElementById(studentID);
+      button.style.background = "green";
+      button.disabled = true;
+      //AJAX CALL HERE TO SERVER TO CHANGE CONFIRMED VALUE TO TRUE. USE INDEX TO FIND VALUE IN ARRAY
+      console.log("index of clicked button", index);
+      $.ajax({
+        contentType: 'application/json;  charset=utf-8',
+        data: JSON.stringify({studentID:studentID, day:day, index:index}),
+        dataType: "text",
+        type: "POST",
+        url: "https://accessspasstest.herokuapp.com/teachers/confirmStudent",
+        headers:reqHeaders,
+        success: function(schedule){
+          console.log("Schedule Found: ", schedule);
+
+        },
+        error: function(){
+          console.log("confirmStudent failed...");
+        }
+      });
+    }
   </script>
 </html>
 

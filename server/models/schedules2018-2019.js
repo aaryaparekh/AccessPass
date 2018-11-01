@@ -33,6 +33,9 @@ var ScheduleSchema = new mongoose.Schema({
   },
   studentsNames:{
     type:Array
+  },
+  studentsConfirmed:{
+    type:Array
   }
 
 });

@@ -75,6 +75,8 @@
 	};
 
 	loginButton.click(function(e) {
+		var button = document.getElementById("login-button");
+		button.disabled = true;
 		var emailVar = document.getElementById("login-form").elements["email"].value;
 		var passwordVar = document.getElementById("login-form").elements["password"].value;
 		loginRequest(emailVar, passwordVar);

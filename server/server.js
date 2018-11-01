@@ -1,8 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const _=require('lodash');
-const moment = require('moment');
-moment().format();
+
+const momentTimezone = require('moment-timezone');
+momentTimezone().tz("America/Los_Angeles").format();
 
 //import local stuff
 //require the mongoose config files
@@ -26,7 +27,7 @@ app.use(express.static(__dirname+'/htmlFiles')); //config middlewear for express
 var cors = require('cors');
 app.use(cors({credentials:true, origin:true}));
 //variable to hold the port
-const port = process.env.PORT || 3000 || 8000 || 8080;
+const port = process.env.PORT || 3000 || 8080;
 
 //For testing purposes
 app.post('/test', (req, res)=>{
@@ -273,10 +274,12 @@ app.post('/schedule/addStudent', authenticate, (req, res)=>{
         if(index == -1){
           schedule.students.push(req.user._id);
           schedule.studentsNames.push(req.user.firstName + " " +req.user.lastName);
+          schedule.studentsConfirmed.push(false);
         }
       } else {
         schedule.students.push(req.user._id);
         schedule.studentsNames.push(req.user.firstName + " " +req.user.lastName);
+        schedule.studentsConfirmed.push(false);
       }
       schedule.save().then(()=>{
          res.status(200).send(schedule);
@@ -290,7 +293,8 @@ app.post('/schedule/addStudent', authenticate, (req, res)=>{
           teacherID: requestData.teacherID,
           teacherName: teacher.firstName + " " +teacher.lastName,
           students: [req.user._id],
-          studentsNames: [req.user.firstName + " " + req.user.lastName]
+          studentsNames: [req.user.firstName + " " + req.user.lastName],
+          studentsConfirmed: [false]
         }).save().then((schedule)=>{
           res.status(200).send(schedule);
         });
@@ -305,7 +309,11 @@ app.post('/schedule/addStudent', authenticate, (req, res)=>{
 //day = 3 is wed, day = 4 is thur
 app.get('/schedule/getSchedule', authenticateTeacher, (req, res)=>{
   var wednesdayStudents = [];
+  var wednesdayID = [];
   var thursdayStudents = [];
+  var thursdayID = [];
+  var studentsConfirmedWednesday = [];
+  var studentsConfirmedThursday = [];
   //Wednesay
   Schedule.findOne({
     date: getNextDate(3),
@@ -316,11 +324,13 @@ app.get('/schedule/getSchedule', authenticateTeacher, (req, res)=>{
       wednesdayStudents.push("No Students Signed Up");
     }else{
       console.log("wednesday Schedule found");
-      for(var x = schedule.students.length; x>0; x--){
+      for(var x = 0; x<schedule.students.length; x++){
+        studentsConfirmedWednesday.push(schedule.studentsConfirmed[x]);
         User.findOne({
-          _id:schedule.students[x-1]
+          _id:schedule.students[x]
         }).then((student)=>{
           wednesdayStudents.push(student.firstName + " " + student.lastName);
+          wednesdayID.push(student._id);
         }, (error)=>{
           console.log("something wrong with getting student names");
         });
@@ -341,11 +351,13 @@ app.get('/schedule/getSchedule', authenticateTeacher, (req, res)=>{
       thursdayStudents.push("No Students Signed Up");
     }else{
       console.log("thursday Schedule found");
-      for(var x = schedule.students.length; x>0; x--){
+      for(var x = 0; x<schedule.students.length; x++){
+        studentsConfirmedThursday.push(schedule.studentsConfirmed[x]);
         User.findOne({
-          _id:schedule.students[x-1]
+          _id:schedule.students[x]
         }).then((student)=>{
           thursdayStudents.push(student.firstName + " " + student.lastName);
+          thursdayID.push(student._id);
         }, (error)=>{
           console.log("something wrong with getting student names");
         });
@@ -356,7 +368,7 @@ app.get('/schedule/getSchedule', authenticateTeacher, (req, res)=>{
     res.status(400).send();
   });
 
-  setTimeout(() => res.status(200).send({"wednesdayStudents":wednesdayStudents, "thursdayStudents":thursdayStudents}), 2000);
+  setTimeout(() => res.status(200).send({"wednesdayStudents":wednesdayStudents, "thursdayStudents":thursdayStudents, "wednesdayIDs":wednesdayID, "thursdayIDs":thursdayID, "studentsConfirmedWednesday":studentsConfirmedWednesday, "studentsConfirmedThursday":studentsConfirmedThursday}), 2000);
 
 });
 
@@ -514,19 +526,53 @@ app.get('/getNextDate', (req, res)=>{
   var dates = [];
   dates.push(getNextDate(3));
   dates.push(getNextDate(4));
-  setTimeout(() => res.status(200).send(dates), 1000);
+  //setTimeout(() => res.status(200).send(dates), 1000);
+  res.status(200).send(dates);
+});
+
+//Confrim Student
+//index is index of student in schedule
+app.post('/teachers/confirmStudent', authenticateTeacher, (req, res)=>{
+  var body = _.pick(req.body, ['studentID', 'day', 'index']);
+  //convert String studentID into a mongodb ID object type:
+  body.studentID = ObjectID(body.studentID);
+  //update for $set
+  update = {};
+  update["studentsConfirmed."+body.index] = true;
+  console.log("Inputs: ", body);
+  console.log("Day: ", getNextDate(body.day));
+  Schedule.findOneAndUpdate({
+    "students":body.studentID,
+    "date": getNextDate(body.day)
+  }, {
+    $set:update
+  }, {
+    "returnOriginal": false
+  }).then(()=>{
+    res.status(200).send();
+  }).catch((e)=>{
+    res.status(400).send(e);
+  });
 });
 
 //Date Generation. Using Moment.js API.
 var getNextDate = function(day){ //day being 0 for sunday 6 for saturday
-  if(moment().day()>day){
-    var date = moment().day(day+7);
+  if(momentTimezone().tz('America/Los_Angeles').day()>day){
+    var date = momentTimezone().tz('America/Los_Angeles').day(day+7);
     var formatedDate = date.format("dddd, MMMM Do YYYY");
   }else{
-    var date = moment().day(day);
+    var date = momentTimezone().tz('America/Los_Angeles').day(day);
     var formatedDate = date.format("dddd, MMMM Do YYYY");
   }
   return formatedDate;
+}
+
+app.get('/getCurrentDate', (req, res)=>{
+    res.status(200).send(getCurrentDate().toString());
+});
+
+var getCurrentDate = function(){
+  return momentTimezone().tz('America/Los_Angeles').day();
 }
 
 app.listen(port, ()=>{
