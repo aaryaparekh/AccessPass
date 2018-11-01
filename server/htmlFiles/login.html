@@ -65,6 +65,8 @@
 			},
 			error: function() {
 				$('#loginError').fadeIn(500);
+				var button = document.getElementById("login-button");
+				button.disabled = false;
 			}
 		});
 
