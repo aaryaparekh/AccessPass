@@ -665,6 +665,47 @@ new CronJob('0 0 15 * * 4', function(){
 
     });
 }, null, true, 'America/Los_Angeles');
+
+//Return last wednesday and thursday unconfirmedStudents schedules
+app.get('/admin/getUnconfirmedSchedules',authenticateAdmin ,(req, res)=>{
+    var returnSchedules = {"wednesdays":null, "thursdays":null};
+    UnconfirmedStudents.find({
+      "date":momentTimezone().tz('America/Los_Angeles').weekday(-4).format("dddd, MMMM Do YYYY")
+    }).then((schedules)=>{
+      if(!schedules.length){
+        returnSchedules.wednesdays = "None."
+        returnSchedules.wednesdayDate = momentTimezone().tz('America/Los_Angeles').weekday(-4).format("dddd, MMMM Do YYYY");
+      }else{
+        returnSchedules.wednesdays = schedules;
+      }
+    }, ()=>{
+      res.status(401).send("Something went wrong with /admin/getUnconfirmedSchedules");
+    });
+
+    UnconfirmedStudents.find({
+      "date":momentTimezone().tz('America/Los_Angeles').weekday(-3).format("dddd, MMMM Do YYYY")
+    }).then((schedules)=>{
+      if(!schedules.length){
+        console.log("none");
+        returnSchedules.thursdays = "None."
+        returnSchedules.thursdayDate = momentTimezone().tz('America/Los_Angeles').weekday(-3).format("dddd, MMMM Do YYYY");
+      }else{
+        console.log("Something");
+        returnSchedules.thursdays = schedules;
+      }
+    }, ()=>{
+      res.status(401).send("Something went wrong with /admin/getUnconfirmedSchedules");
+    });
+
+    setTimeout(() => res.status(200).send({"schedules":returnSchedules}), 3000);
+
+});
+
+app.post('/getNextDateTest',(req, res)=>{
+  var body = _.pick(req.body, ['day']);
+  res.status(200).send(momentTimezone().tz('America/Los_Angeles').weekday(body.day).format("dddd, MMMM Do YYYY"));
+  //var formatedDate = date.format("dddd, MMMM Do YYYY");
+});
 //---------------------------------------XX-------------------------------------->>>>
 app.listen(port, ()=>{
   console.log(`Started server on port ${port}`);

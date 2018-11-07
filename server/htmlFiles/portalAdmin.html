@@ -25,7 +25,10 @@
 
     <div class="side-form">
       <h3>Unconfirmed Students:</h3>
-      <p1 id="UnconfirmedStudents">o haoshdoahsdasdas dasdasd asd asdasd sadasdasda dasd asd asd asd asd asd o</p1>
+      <h3 id="unconfirmedStudents_Wednesday_Date">Loading...</h3>
+        <p1 id="unconfirmedStudents_Wednesday_Names"></p1>
+      <h3 id="unconfirmedStudents_Thursday_Date">Loading...</h3>
+        <p1 id="unconfirmedStudents_Thursday_Names"></p1>
     </div>
 
   <br/>
@@ -55,6 +58,37 @@
           },
           error: function(){
             console.log("/admin/getName failed...");
+
+          }
+        });
+      })();
+
+      //Get unconfirmedStudents schedule for the last thursday and wednesday
+      (function() {
+        $.ajax({
+          contentType: 'application/json;  charset=utf-8',
+          type: "GET",
+          url: "https://accessspasstest.herokuapp.com/admin/getUnconfirmedSchedules",
+          headers:reqHeaders,
+          success: function(schedules){
+            wednesdayDate = document.getElementById("unconfirmedStudents_Wednesday_Date");
+            wednesdayStudents = document.getElementById("unconfirmedStudents_Wednesday_Names");
+            //wednesday
+            for(var x = 0; x<schedules.wednesdays.length; x++){
+              if(!schedules.wednesdays[0].students){
+                  //only set date
+                  wednesdayDate.innerHTML = schedules.wednesdays.wednesdayDate;
+              }else{
+                wednesdayDate.innerHTML = schedules.wednesdays[0].date;
+                for(var y = 0; y<schedules.wednesdays[x].students.length; y++){
+                  //console.log(schedules.wednesdays[x].students[y]);
+                  wednesdayStudents.innterHTML += schedules.wednesday[x].studentsNames[y]; + " <br />";
+                }
+              }
+            }
+          },
+          error: function(){
+
 
           }
         });
