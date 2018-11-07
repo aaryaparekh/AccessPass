@@ -23,9 +23,16 @@
 
   <br/>
 
+    <div class="side-form">
+      <h3>Unconfirmed Students:</h3>
+      <p1 id="UnconfirmedStudents">o haoshdoahsdasdas dasdasd asd asdasd sadasdasda dasd asd asd asd asd asd o</p1>
+    </div>
+
+  <br/>
+
 	  <div class="form">
 				<h3 id ="loginError" style="display:none;">Incorrect Email or Password</h3>
-				<h1>Enter 1 Or More Parameters To Get Back All Results With The Following Student/Teacher/Date.</h1>
+				<h1>Search for all sign ups using student or teacher emails, or dates.</h1>
 	      <input type="text" placeholder="Student Email" id="studentEmail"/>
 	      <input type="text" placeholder="Teacher Email" id="teacherEmail"/>
         <input type="text" placeholder="Date" id="date"/>
@@ -64,7 +71,9 @@
           url:"https://accessspasstest.herokuapp.com/admin/queryDatabase",
           headers: reqHeaders,
           success: function(data){
-            console.log(data);
+            var button = document.getElementById("search-button");
+        		button.disabled = false;
+
             var display = document.getElementById("scheduleDisplay");
             display.innerHTML = "";
             for(var x = data.students.length; x>0; x--){
@@ -81,12 +90,17 @@
           error: function(){
             console.log("Something went wrong when querying schedules");
             document.getElementById("scheduleDisplay").innerHTML = "Sorry, Something Went Wrong...";
+
+            var button = document.getElementById("search-button");
+        		button.disabled = false;
           }
         });
       }
 
 
     	searchButton.click(function(e){
+        var button = document.getElementById("search-button");
+    		button.disabled = true;
         var studentEmail = document.getElementById("studentEmail").value;
         var teacherEmail = document.getElementById("teacherEmail").value;
         var date = document.getElementById("date").value;

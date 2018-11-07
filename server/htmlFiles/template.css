@@ -65,12 +65,27 @@ h3 {
   z-index: 1;
   background: #ffffff;
   max-width: 360px;
-  margin: 0 auto 15px;
+  margin: 0 auto 0px;
   padding: 45px;
   text-align: center;
   box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
   border-radius: 10px;
 }
+
+.side-form {
+  position: fixed;
+  bottom: 20px;
+  right: 30px;
+  z-index: 1;
+  background: #ffffff;
+  max-width: 360px;
+  margin: 0 auto 15px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+  border-radius: 10px;
+}
+
 .box {
   position: relative;
   z-index: 1;

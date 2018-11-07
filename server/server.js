@@ -14,6 +14,7 @@ var {User} = require('./models/user');
 var {Teacher} = require('./models/teacher');
 var {Schedule} = require('./models/schedules2018-2019');
 var {Admin} = require('./models/admin');
+var {UnconfirmedStudents} = require('./models/unconfirmedStudents');
 //middlewear
 var {authenticate} = require('./middlewear/authenticate');
 var {authenticateTeacher} = require('./middlewear/authenticateTeacher');
@@ -575,6 +576,96 @@ var getCurrentDate = function(){
   return momentTimezone().tz('America/Los_Angeles').day();
 }
 
+//Scheduled Jobs ---------------------------------------------------------------->>>>
+var CronJob = require('cron').CronJob;
+//Wednesday at 3pm: '* 15 * * 3'
+new CronJob('0 0 15 * * 3', function(){
+  Schedule.find({
+      "date": getNextDate(3),
+      "studentsConfirmed": false
+    }).then((schedules)=>{
+      if(schedules){
+        console.log(schedules);
+        var date;
+        var teacherName;
+        var teacherID;
+        var studentsNames = [];
+        var students = [];
+        for(var x = 0; x<schedules.length; x++){
+          date = schedules[x].date;
+          teacherName = schedules[x].teacherName;
+          teacherID = schedules[x].teacherID;
+          for(var y = 0; y<schedules[x].students.length; y++){
+            if(schedules[x].studentsConfirmed[y] == false){
+              studentsNames.push(schedules[x].studentsNames[y]);
+              students.push(schedules[x].students[y]);
+            }
+          }
+          new UnconfirmedStudents({
+            date: date,
+            teacherID: teacherID,
+            teacherName: teacherName,
+            students: students,
+            studentsNames: studentsNames
+          }).save().then((schedule)=>{
+            console.log(schedule);
+          });
+
+          date = null;
+          teacherName = null;
+          teacherID = null;
+          studentsNames = [];
+          students = [];
+        }
+      }
+
+    });
+}, null, true, 'America/Los_Angeles');
+
+//Thursday at 3pm: '* 15 * * 4'
+new CronJob('0 0 15 * * 4', function(){
+  Schedule.find({
+      "date": getNextDate(3),
+      "studentsConfirmed": false
+    }).then((schedules)=>{
+      if(schedules){
+        console.log(schedules);
+        var date;
+        var teacherName;
+        var teacherID;
+        var studentsNames = [];
+        var students = [];
+        for(var x = 0; x<schedules.length; x++){
+          date = schedules[x].date;
+          teacherName = schedules[x].teacherName;
+          teacherID = schedules[x].teacherID;
+          for(var y = 0; y<schedules[x].students.length; y++){
+            if(schedules[x].studentsConfirmed[y] == false){
+              studentsNames.push(schedules[x].studentsNames[y]);
+              students.push(schedules[x].students[y]);
+            }
+          }
+          new UnconfirmedStudents({
+            date: date,
+            teacherID: teacherID,
+            teacherName: teacherName,
+            students: students,
+            studentsNames: studentsNames
+          }).save().then((schedule)=>{
+            console.log(schedule);
+          });
+
+          date = null;
+          teacherName = null;
+          teacherID = null;
+          studentsNames = [];
+          students = [];
+        }
+      }
+
+    });
+}, null, true, 'America/Los_Angeles');
+//---------------------------------------XX-------------------------------------->>>>
 app.listen(port, ()=>{
   console.log(`Started server on port ${port}`);
 });
