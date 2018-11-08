@@ -79,6 +79,7 @@
               if(!schedules.wednesdays[0].students){
                   //only set date
                   wednesdayDate.innerHTML = schedules.wednesdayDate;
+                  wednesdayStudents.innerHTML = schedules.wednesdays;
               }else{
                 wednesdayDate.innerHTML = schedules.wednesdays[0].date;
                 for(var y = 0; y<schedules.wednesdays[x].students.length; y++){
