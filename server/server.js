@@ -579,10 +579,10 @@ var getCurrentDate = function(){
 //Scheduled Jobs ---------------------------------------------------------------->>>>
 var CronJob = require('cron').CronJob;
 //Wednesday at 3pm: '0 0 15 * * 3'
-new CronJob('0 47 16 * * 3', function(){
+new CronJob('0 0 15 * * 3', function(){
   console.log("PERFORMING CRON JOB");
   Schedule.find({
-      "date": momentTimezone().tz('America/Los_Angeles').weekday(-4).format("dddd, MMMM Do YYYY"), //getNextDate(3)
+      "date": getNextDate(3),
       "studentsConfirmed": false
     }).then((schedules)=>{
       if(schedules){
@@ -677,7 +677,7 @@ app.get('/admin/getUnconfirmedSchedules',authenticateAdmin ,(req, res)=>{
         returnSchedules.wednesdays.push("None");
         returnSchedules.wednesdayDate = momentTimezone().tz('America/Los_Angeles').weekday(-4).format("dddd, MMMM Do YYYY");
       }else{
-        returnSchedules.wednesdays.push(schedules);
+        returnSchedules.wednesdays = schedules;
       }
     }, ()=>{
       res.status(401).send("Something went wrong with /admin/getUnconfirmedSchedules");
