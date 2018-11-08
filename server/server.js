@@ -697,7 +697,7 @@ app.get('/admin/getUnconfirmedSchedules',authenticateAdmin ,(req, res)=>{
       res.status(401).send("Something went wrong with /admin/getUnconfirmedSchedules");
     });
 
-    setTimeout(() => res.status(200).send({"schedules":returnSchedules}), 3000);
+    setTimeout(() => res.status(200).send(returnSchedules), 3000);
 
 });
 
