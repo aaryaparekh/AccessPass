@@ -668,15 +668,15 @@ new CronJob('0 0 15 * * 4', function(){
 
 //Return last wednesday and thursday unconfirmedStudents schedules
 app.get('/admin/getUnconfirmedSchedules',authenticateAdmin ,(req, res)=>{
-    var returnSchedules = {"wednesdays":null, "thursdays":null};
+    var returnSchedules = {"wednesdays":[], "thursdays":[]};
     UnconfirmedStudents.find({
       "date":momentTimezone().tz('America/Los_Angeles').weekday(-4).format("dddd, MMMM Do YYYY")
     }).then((schedules)=>{
       if(!schedules.length){
-        returnSchedules.wednesdays = "None."
+        returnSchedules.wednesdays.push("None");
         returnSchedules.wednesdayDate = momentTimezone().tz('America/Los_Angeles').weekday(-4).format("dddd, MMMM Do YYYY");
       }else{
-        returnSchedules.wednesdays = schedules;
+        returnSchedules.wednesdays.push(schedules);
       }
     }, ()=>{
       res.status(401).send("Something went wrong with /admin/getUnconfirmedSchedules");
@@ -687,11 +687,11 @@ app.get('/admin/getUnconfirmedSchedules',authenticateAdmin ,(req, res)=>{
     }).then((schedules)=>{
       if(!schedules.length){
         console.log("none");
-        returnSchedules.thursdays = "None."
+        returnSchedules.thursdays.push("None.");
         returnSchedules.thursdayDate = momentTimezone().tz('America/Los_Angeles').weekday(-3).format("dddd, MMMM Do YYYY");
       }else{
         console.log("Something");
-        returnSchedules.thursdays = schedules;
+        returnSchedules.thursdays.push(schedules);
       }
     }, ()=>{
       res.status(401).send("Something went wrong with /admin/getUnconfirmedSchedules");
