@@ -73,7 +73,8 @@
           success: function(schedules){
             wednesdayDate = document.getElementById("unconfirmedStudents_Wednesday_Date");
             wednesdayStudents = document.getElementById("unconfirmedStudents_Wednesday_Names");
-            console.log(schedules);
+            thursdayDate = document.getElementById("unconfirmedStudents_Thursday_Date");
+            thursdayStudents = document.getElementById("unconfirmedStudents_Thursday_Names");
             //wednesday
             for(var x = 0; x<schedules.wednesdays.length; x++){
               if(!schedules.wednesdays[0].students){
@@ -81,11 +82,23 @@
                   wednesdayDate.innerHTML = schedules.wednesdayDate;
                   wednesdayStudents.innerHTML = schedules.wednesdays;
               }else{
-                console.log("Wednesdays are not empty");
                 wednesdayDate.innerHTML = schedules.wednesdays[0].date;
                 for(var y = 0; y<schedules.wednesdays[x].students.length; y++){
-                  console.log(schedules.wednesdays[x].studentsNames[y]);
                   wednesdayStudents.innerHTML += schedules.wednesdays[x].studentsNames[y] + "<br>";
+                }
+              }
+            }
+
+            //thursday
+            for(var x = 0; x<schedules.thursdays.length; x++){
+              if(!schedules.thursdays[0].students){
+                  //only set date
+                  thursdayDate.innerHTML = schedules.thursdayDate;
+                  thursdayStudents.innerHTML = schedules.thursdays;
+              }else{
+                thursdayDate.innerHTML = schedules.thursdays[0].date;
+                for(var y = 0; y<schedules.thursdays[x].students.length; y++){
+                  thursdayStudents.innerHTML += schedules.thursdays[x].studentsNames[y] + "<br>";
                 }
               }
             }
