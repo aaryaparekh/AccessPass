@@ -579,7 +579,8 @@ var getCurrentDate = function(){
 //Scheduled Jobs ---------------------------------------------------------------->>>>
 var CronJob = require('cron').CronJob;
 //Wednesday at 3pm: '0 0 15 * * 3'
-new CronJob('0 34 16 * * 3', function(){
+new CronJob('0 41 16 * * 3', function(){
+  console.log("PERFORMING CRON JOB")
   Schedule.find({
       "date": getNextDate(3),
       "studentsConfirmed": false
