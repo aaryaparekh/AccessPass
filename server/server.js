@@ -691,8 +691,7 @@ app.get('/admin/getUnconfirmedSchedules',authenticateAdmin ,(req, res)=>{
         returnSchedules.thursdays.push("None.");
         returnSchedules.thursdayDate = momentTimezone().tz('America/Los_Angeles').weekday(-3).format("dddd, MMMM Do YYYY");
       }else{
-        console.log("Something");
-        returnSchedules.thursdays.push(schedules);
+        returnSchedules.thursdays = schedules;
       }
     }, ()=>{
       res.status(401).send("Something went wrong with /admin/getUnconfirmedSchedules");
