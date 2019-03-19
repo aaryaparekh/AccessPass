@@ -145,7 +145,7 @@
           error: function(response){
             console.log("Something went wrong when querying schedules");
             console.log(response);
-            document.getElementById("scheduleDisplay").innerHTML = response.message;
+            document.getElementById("scheduleDisplay").innerHTML = response.responseJSON.message;
 
             var button = document.getElementById("search-button");
         		button.disabled = false;
