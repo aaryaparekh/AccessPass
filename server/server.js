@@ -454,7 +454,6 @@ if(body.studentEmail){
     studentID = student._id;
   }, (error)=>{
     console.log("error in admin/queryDatabase");
-    res.status(400).send({message:"No student with that name found."});
   });
 }
 
@@ -467,8 +466,7 @@ if(body.teacherEmail){
     }
     teacherID = teacher._id;
   }, (error)=>{
-    console.log("error in admin/queryDatabase")
-    res.status(400).send({message:"No teacher with that name found."});
+    console.log("error in admin/queryDatabase");
   });
 }
 
