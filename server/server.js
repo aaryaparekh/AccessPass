@@ -448,9 +448,9 @@ if(body.studentEmail){
   User.findOne({
     "email":body.studentEmail
   }).then((student)=>{
-    if(!student){
-      res.status(400).send({message:"No student with that name found."});
-    }
+    // if(!student){
+    //   res.status(400).send({message:"No student with that name found."});
+    // }
     studentID = student._id;
   }, (error)=>{
     console.log("error in admin/queryDatabase");
@@ -461,9 +461,9 @@ if(body.teacherEmail){
   Teacher.findOne({
     "email":body.teacherEmail
   }).then((teacher)=>{
-    if(!teacher){
-      res.status(400).send({message:"No teacher with that name found."});
-    }
+    // if(!teacher){
+    //   res.status(400).send({message:"No teacher with that name found."});
+    // }
     teacherID = teacher._id;
   }, (error)=>{
     console.log("error in admin/queryDatabase");
