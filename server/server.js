@@ -444,21 +444,27 @@ app.post('/admin/queryDatabase', authenticateAdmin,(req, res)=>{
 
   console.log("Initial input: ", body.studentEmail, body.teacherEmail, body.date);
 
+if(body.studentEmail){
   User.findOne({
     "email":body.studentEmail
   }).then((student)=>{
     studentID = student._id;
   }, (error)=>{
     console.log("error in admin/queryDatabase");
+    res.status(400).send({message:"No student with that name found."});
   });
+}
 
+if(body.teacherEmail){
   Teacher.findOne({
     "email":body.teacherEmail
   }).then((teacher)=>{
     teacherID = teacher._id;
   }, (error)=>{
     console.log("error in admin/queryDatabase")
+    res.status(400).send({message:"No teacher with that name found."});
   });
+}
 
   dateVar = body.date;
 

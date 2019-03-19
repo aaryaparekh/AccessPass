@@ -144,7 +144,7 @@
           },
           error: function(){
             console.log("Something went wrong when querying schedules");
-            document.getElementById("scheduleDisplay").innerHTML = "Sorry, Something Went Wrong...";
+            document.getElementById("scheduleDisplay").innerHTML = response.data.message;
 
             var button = document.getElementById("search-button");
         		button.disabled = false;
