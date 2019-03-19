@@ -448,6 +448,7 @@ if(body.studentEmail){
   User.findOne({
     "email":body.studentEmail
   }).then((student)=>{
+    console.log(student);
     if(!student){
       res.status(400).send({message:"No student with that name found."});
     }
