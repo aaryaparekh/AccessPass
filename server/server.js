@@ -449,6 +449,9 @@ if(body.studentEmail){
     "email":body.studentEmail
   }).then((student)=>{
     studentID = student._id;
+    if(!student){
+      res.status(400).send({message:"No student with that name found."});
+    }
   }, (error)=>{
     console.log("error in admin/queryDatabase");
     res.status(400).send({message:"No student with that name found."});
@@ -460,6 +463,9 @@ if(body.teacherEmail){
     "email":body.teacherEmail
   }).then((teacher)=>{
     teacherID = teacher._id;
+    if(!teacher){
+      res.status(400).send({message:"No teacher with that name found."});
+    }
   }, (error)=>{
     console.log("error in admin/queryDatabase")
     res.status(400).send({message:"No teacher with that name found."});
