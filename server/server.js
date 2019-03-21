@@ -694,7 +694,7 @@ app.get('/admin/getUnconfirmedSchedules',authenticateAdmin ,(req, res)=>{
     });
 
     UnconfirmedStudents.find({
-      "date":momentTimezone().tz('America/Los_Angeles').weekday(-3).format("dddd, MMMM Do YYYY")
+      "date":momentTimezone().tz('America/Los_Angeles').weekday(3).format("dddd, MMMM Do YYYY")
     }).then((schedules)=>{
       if(!schedules.length){
         console.log("none");
